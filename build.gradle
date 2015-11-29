@@ -4,9 +4,33 @@ plugins {
 
 apply plugin: 'java'
 apply plugin: 'idea'
+apply plugin: 'maven-publish'
 
 group = 'com.btmatthews.jcrunit'
 version = '1.0.0-SNAPSHOT'
+
+sourceCompatibility  = 1.7
+targetCompatibility  = 1.7
+
+task sourceJar(type: Jar) {
+    from sourceSets.main.allJava
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            groupId 'com.btmatthews.jcrunit'
+            artifactId 'jcrunit'
+            version '1.0.0-SNAPSHOT'
+
+            from components.java
+
+            artifact sourceJar {
+                classifier "sources"
+            }
+        }
+    }
+}
 
 repositories {
     mavenCentral()
