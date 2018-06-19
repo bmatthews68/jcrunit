@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<a xmlns:jcr="http://www.jcp.org/jcr/1.0"
+   xmlns:nt="http://www.jcp.org/jcr/nt/1.0"
+   xmlns:mix="http://www.jcp.org/jcr/mix/1.0"
+   jcr:primaryType="nt:folder"
+   jcr:mixinTypes="mix:referenceable"
+   jcr:uuid="f257cbaa-8da1-11e6-ae22-56b6b6499611"
+   jcr:created="2016-04-01T08:04:00.000+01:00"
+   jcr:createdBy="admin">
+    <b jcr:primaryType="nt:folder"
+       jcr:mixinTypes="mix:referenceable"
+       jcr:uuid="f257d10e-8da1-11e6-ae22-56b6b6499611"
+       jcr:created="2016-04-01T08:05:00.000+01:00"
+       jcr:createdBy="admin">
+        <c jcr:primaryType="nt:file"
+           jcr:mixinTypes="mix:referenceable"
+           jcr:uuid="f835e33a-10fa-409e-8a01-e16089988199"
+           jcr:created="2016-04-01T08:06:00.000+01:00"
+           jcr:createdBy="admin">
+            <jcr:content jcr:primaryType="nt:resource"
+                         jcr:mimeType="text/plain"
+                         jcr:data="Hello World"/>
+        </c>
+    </b>
+    <d jcr:primaryType="nt:folder"
+       jcr:mixinTypes="mix:referenceable"
+       jcr:uuid="f257d1e0-8da1-11e6-ae22-56b6b6499611"
+       jcr:created="2016-04-01T08:09:00.000+01:00"
+       jcr:createdBy="admin"/>
+</a>

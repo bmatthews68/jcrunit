@@ -16,7 +16,6 @@
 
 package com.btmatthews.jcrunit;
 
-import org.apache.commons.io.input.ReaderInputStream;
 import org.apache.jackrabbit.oak.Oak;
 import org.apache.jackrabbit.oak.jcr.Jcr;
 import org.junit.rules.ExternalResource;
@@ -26,7 +25,6 @@ import javax.jcr.nodetype.NodeType;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.StringReader;
 
 public final class JCRRepositoryRule extends ExternalResource {
 
@@ -106,7 +104,7 @@ public final class JCRRepositoryRule extends ExternalResource {
                                         final String encoding,
                                         final String data)
             throws IOException, RepositoryException {
-        try (final InputStream inputStream = new ReaderInputStream(new StringReader(data))) {
+        try (final InputStream inputStream = new ByteArrayInputStream(data.getBytes("UTF-8"))) {
             return createFile(path, name, type, encoding, inputStream);
         }
     }
@@ -127,10 +125,10 @@ public final class JCRRepositoryRule extends ExternalResource {
             resource.setProperty(Property.JCR_ENCODING, encoding);
             resource.setProperty(Property.JCR_DATA, valueFactory.createBinary(inputStream));
             session.save();
-            return this;
         } finally {
             session.logout();
         }
+        return this;
     }
 
     public JCRRepositoryRule assertFolderExists(final String path) {
@@ -141,13 +139,13 @@ public final class JCRRepositoryRule extends ExternalResource {
                 if (!node.isNodeType(NodeType.NT_FOLDER)) {
                     throw new AssertionError(path + " is not a folder");
                 }
-                return this;
             } finally {
                 session.logout();
             }
         } catch (final RepositoryException e) {
             throw new AssertionError(path + " does not exist", e);
         }
+        return this;
     }
 
     public JCRRepositoryRule assertFileExists(final String path) {
@@ -158,12 +156,31 @@ public final class JCRRepositoryRule extends ExternalResource {
                 if (!node.isNodeType(NodeType.NT_FILE)) {
                     throw new AssertionError(path + " is not a file");
                 }
-                return this;
             } finally {
                 session.logout();
             }
         } catch (final RepositoryException e) {
             throw new AssertionError(path + " does not exist", e);
         }
+        return this;
+    }
+
+    public JCRRepositoryRule importFromXML(final String path) throws IOException, RepositoryException {
+        return importFromXML(Thread.currentThread().getContextClassLoader().getResourceAsStream(path));
+    }
+
+    public JCRRepositoryRule importFromXML(final InputStream inputStream) throws IOException, RepositoryException {
+        return importFromXML(credentials, inputStream);
+    }
+
+    public JCRRepositoryRule importFromXML(final Credentials credentials, final InputStream inputStream) throws IOException, RepositoryException {
+        final Session session = repository.login(credentials);
+        try {
+            session.importXML("/", inputStream, ImportUUIDBehavior.IMPORT_UUID_COLLISION_THROW);
+            session.save();
+        } finally {
+            session.logout();
+        }
+        return this;
     }
 }
