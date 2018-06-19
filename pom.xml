@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.btmatthews.jcrunit</groupId>
     <artifactId>jcrunit</artifactId>
-    <version>1.1.0</version>
+    <version>1.1.1-SNAPSHOT</version>
     <name>JCR Unit</name>
     <description>JUnit 4 rule for testing with in memory JCR repository.</description>
     <inceptionYear>2015</inceptionYear>
@@ -213,7 +213,7 @@
         <connection>scm:git:git@github.com:bmatthews68/jcrunit.git</connection>
         <url>https://github.com/bmatthews68/jcrunit</url>
         <developerConnection>scm:git:git@github.com:bmatthews68/jcrunit.git</developerConnection>
-        <tag>1.1.0</tag>
+        <tag>HEAD</tag>
     </scm>
     <url>https://github.com/bmatthews68/jcrunit</url>
     <organization>
