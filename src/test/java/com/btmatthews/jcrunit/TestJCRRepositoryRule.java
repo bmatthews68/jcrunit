@@ -2,7 +2,6 @@ package com.btmatthews.jcrunit;
 
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 import javax.jcr.ItemExistsException;
 import javax.jcr.PathNotFoundException;
@@ -12,6 +11,7 @@ import java.security.SecureRandom;
 import java.util.Random;
 
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThrows;
 
 public class TestJCRRepositoryRule {
 
@@ -19,9 +19,6 @@ public class TestJCRRepositoryRule {
     private static final String DATA_FOLDER = "/data";
     @Rule
     public JCRRepositoryRule repositoryRule = new JCRRepositoryRule();
-
-    @Rule
-    public ExpectedException expectedException = ExpectedException.none();
 
     @Test
     public void repositoryHasBeenCreated() {
@@ -36,19 +33,20 @@ public class TestJCRRepositoryRule {
     }
 
     @Test
-    public void cannotCreateDuplicateRootFolder() throws RepositoryException {
-        expectedException.expect(ItemExistsException.class);
-        repositoryRule
-                .createRootFolder("top")
-                .assertFolderExists("/top")
-                .createRootFolder("top");
+    public void cannotCreateDuplicateRootFolder() {
+        assertThrows(
+                ItemExistsException.class,
+                () -> repositoryRule
+                        .createRootFolder("top")
+                        .assertFolderExists("/top")
+                        .createRootFolder("top"));
     }
 
     @Test
-    public void cannotCreateSubFolderIfRootDoesNotExist() throws RepositoryException {
-        expectedException.expect(PathNotFoundException.class);
-        repositoryRule
-                .createFolder("/top", "sub");
+    public void cannotCreateSubFolderIfRootDoesNotExist() {
+        assertThrows(
+                PathNotFoundException.class,
+                () -> repositoryRule.createFolder("/top", "sub"));
     }
 
 
@@ -82,33 +80,27 @@ public class TestJCRRepositoryRule {
 
     @Test
     public void assertFolderExistsFailsWhenFolderDoesNotExist() {
-        expectedException.expect(AssertionError.class);
-        repositoryRule
-                .assertFolderExists(DATA_FOLDER);
+        assertThrows(AssertionError.class, () -> repositoryRule.assertFolderExists(DATA_FOLDER));
     }
 
     @Test
-    public void assertFolderExistsFailsBecauseItemIsNotAFolder() throws RepositoryException, IOException {
-        expectedException.expect(AssertionError.class);
-        repositoryRule
-                .createRootFolder("data")
-                .createFile(DATA_FOLDER, DATA_TXT, "text/plain", "UTF-8", "Hello world!")
-                .assertFolderExists("/data/data.txt");
+    public void assertFolderExistsFailsBecauseItemIsNotAFolder() {
+        assertThrows(
+                AssertionError.class,
+                () -> repositoryRule
+                        .createRootFolder("data")
+                        .createFile(DATA_FOLDER, DATA_TXT, "text/plain", "UTF-8", "Hello world!")
+                        .assertFolderExists("/data/data.txt"));
     }
 
     @Test
     public void assertFileExistsFailsWhenFileDoesNotExist() {
-        expectedException.expect(AssertionError.class);
-        repositoryRule
-                .assertFileExists(DATA_TXT);
+        assertThrows(AssertionError.class, () -> repositoryRule.assertFileExists(DATA_TXT));
     }
 
     @Test
-    public void assertFileExistsFailsBecauseItemIsNotAFile() throws RepositoryException {
-        expectedException.expect(AssertionError.class);
-        repositoryRule
-                .createRootFolder("data")
-                .assertFileExists(DATA_FOLDER);
+    public void assertFileExistsFailsBecauseItemIsNotAFile() {
+        assertThrows(AssertionError.class, () -> repositoryRule.createRootFolder("data").assertFileExists(DATA_FOLDER));
     }
 
     @Test
