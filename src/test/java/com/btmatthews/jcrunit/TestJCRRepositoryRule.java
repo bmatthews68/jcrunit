@@ -24,7 +24,6 @@ import javax.jcr.PathNotFoundException;
 import javax.jcr.RepositoryException;
 import java.io.IOException;
 import java.security.SecureRandom;
-import java.util.Random;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThrows;
@@ -77,7 +76,7 @@ public class TestJCRRepositoryRule {
 
     @Test
     public void canCreateBinaryFile() throws IOException, RepositoryException {
-        final byte[] data = generateBinaryData();
+        final var data = generateBinaryData();
         repositoryRule
                 .createRootFolder("bin")
                 .assertFolderExists("/bin")
@@ -130,9 +129,9 @@ public class TestJCRRepositoryRule {
     }
 
     private byte[] generateBinaryData() {
-        final Random random = new SecureRandom();
+        final var random = new SecureRandom();
         final int size = 1024 + random.nextInt(4096);
-        final byte[] data = new byte[size];
+        final var data = new byte[size];
         random.nextBytes(data);
         return data;
     }
