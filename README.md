@@ -16,7 +16,7 @@ coordinates:
 <dependency>
     <groupId>com.btmatthews.jcrunit</groupId>
     <artifactId>jcrunit</artifactId>
-    <version>1.1.0</version>
+    <version>2.0.0</version>
 </dependency>
 ```
 
