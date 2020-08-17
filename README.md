@@ -7,6 +7,12 @@ content repository using the [Jackrabbit Oak](https://jackrabbit.apache.org/oak/
 
 The current release only supports file (nt:file) and folder (nt:folder) node types.
 
+Requirements
+------------
+
+* Java 11+
+* JUnit 4.13
+
 Maven Central Coordinates
 -------------------------
 **LDAPUnit** has been published in [Maven Central](http://search.maven.org) at the following
