@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Brian Thomas Matthews
+ * Copyright 2015-2020 Brian Thomas Matthews
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,17 +20,24 @@ import org.apache.jackrabbit.oak.Oak;
 import org.apache.jackrabbit.oak.jcr.Jcr;
 import org.junit.rules.ExternalResource;
 
-import javax.jcr.*;
+import javax.jcr.Credentials;
+import javax.jcr.ImportUUIDBehavior;
+import javax.jcr.Node;
+import javax.jcr.Property;
+import javax.jcr.Repository;
+import javax.jcr.RepositoryException;
+import javax.jcr.SimpleCredentials;
 import javax.jcr.nodetype.NodeType;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 
 public final class JCRRepositoryRule extends ExternalResource {
 
     private Repository repository;
 
-    private Credentials credentials;
+    private final Credentials credentials;
 
     public JCRRepositoryRule() {
         this("admin", "admin");
@@ -62,9 +69,9 @@ public final class JCRRepositoryRule extends ExternalResource {
 
     public JCRRepositoryRule createRootFolder(final String name)
             throws RepositoryException {
-        final Session session = repository.login(credentials);
+        final var session = repository.login(credentials);
         try {
-            final Node parent = session.getRootNode();
+            final var parent = session.getRootNode();
             parent.addNode(name, NodeType.NT_FOLDER);
             session.save();
             return this;
@@ -76,9 +83,9 @@ public final class JCRRepositoryRule extends ExternalResource {
     public JCRRepositoryRule createFolder(final String path,
                                           final String name)
             throws RepositoryException {
-        final Session session = repository.login(credentials);
+        final var session = repository.login(credentials);
         try {
-            final Node parent = session.getNode(path);
+            final var parent = session.getNode(path);
             parent.addNode(name, NodeType.NT_FOLDER);
             session.save();
             return this;
@@ -93,7 +100,7 @@ public final class JCRRepositoryRule extends ExternalResource {
                                         final String encoding,
                                         final byte[] data)
             throws IOException, RepositoryException {
-        try (final InputStream inputStream = new ByteArrayInputStream(data)) {
+        try (final var inputStream = new ByteArrayInputStream(data)) {
             return createFile(path, name, type, encoding, inputStream);
         }
     }
@@ -104,7 +111,7 @@ public final class JCRRepositoryRule extends ExternalResource {
                                         final String encoding,
                                         final String data)
             throws IOException, RepositoryException {
-        try (final InputStream inputStream = new ByteArrayInputStream(data.getBytes("UTF-8"))) {
+        try (final var inputStream = new ByteArrayInputStream(data.getBytes(StandardCharsets.UTF_8))) {
             return createFile(path, name, type, encoding, inputStream);
         }
     }
@@ -115,12 +122,12 @@ public final class JCRRepositoryRule extends ExternalResource {
                                         final String encoding,
                                         final InputStream inputStream)
             throws RepositoryException {
-        final Session session = repository.login(credentials);
+        final var session = repository.login(credentials);
         try {
-            final ValueFactory valueFactory = session.getValueFactory();
-            final Node parent = session.getNode(path);
-            final Node file = parent.addNode(name, NodeType.NT_FILE);
-            final Node resource = file.addNode(Node.JCR_CONTENT, NodeType.NT_RESOURCE);
+            final var valueFactory = session.getValueFactory();
+            final var parent = session.getNode(path);
+            final var file = parent.addNode(name, NodeType.NT_FILE);
+            final var resource = file.addNode(Node.JCR_CONTENT, NodeType.NT_RESOURCE);
             resource.setProperty(Property.JCR_MIMETYPE, type);
             resource.setProperty(Property.JCR_ENCODING, encoding);
             resource.setProperty(Property.JCR_DATA, valueFactory.createBinary(inputStream));
@@ -133,9 +140,9 @@ public final class JCRRepositoryRule extends ExternalResource {
 
     public JCRRepositoryRule assertFolderExists(final String path) {
         try {
-            final Session session = repository.login(credentials);
+            final var session = repository.login(credentials);
             try {
-                final Node node = session.getNode(path);
+                final var node = session.getNode(path);
                 if (!node.isNodeType(NodeType.NT_FOLDER)) {
                     throw new AssertionError(path + " is not a folder");
                 }
@@ -150,9 +157,9 @@ public final class JCRRepositoryRule extends ExternalResource {
 
     public JCRRepositoryRule assertFileExists(final String path) {
         try {
-            final Session session = repository.login(credentials);
+            final var session = repository.login(credentials);
             try {
-                final Node node = session.getNode(path);
+                final var node = session.getNode(path);
                 if (!node.isNodeType(NodeType.NT_FILE)) {
                     throw new AssertionError(path + " is not a file");
                 }
@@ -174,7 +181,7 @@ public final class JCRRepositoryRule extends ExternalResource {
     }
 
     public JCRRepositoryRule importFromXML(final Credentials credentials, final InputStream inputStream) throws IOException, RepositoryException {
-        final Session session = repository.login(credentials);
+        final var session = repository.login(credentials);
         try {
             session.importXML("/", inputStream, ImportUUIDBehavior.IMPORT_UUID_COLLISION_THROW);
             session.save();
