@@ -33,7 +33,7 @@ public class TestJCRRepositoryRule {
     private static final String DATA_TXT = "data.txt";
     private static final String DATA_FOLDER = "/data";
     @Rule
-    public JCRRepositoryRule repositoryRule = new JCRRepositoryRule();
+    public JCRRepositoryRule repositoryRule = JCRRepositoryRule.withDefaultCredentials();
 
     @Test
     public void repositoryHasBeenCreated() {
