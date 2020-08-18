@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>JCRRepositoryRule.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">JCR Unit</a> &gt; <a href="index.source.html" class="el_package">com.btmatthews.jcrunit</a> &gt; <span class="el_source">JCRRepositoryRule.java</span></div><h1>JCRRepositoryRule.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2015-2020 Brian Thomas Matthews
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.btmatthews.jcrunit;
+
+import org.apache.jackrabbit.oak.Oak;
+import org.apache.jackrabbit.oak.jcr.Jcr;
+import org.junit.rules.ExternalResource;
+
+import javax.jcr.Credentials;
+import javax.jcr.ImportUUIDBehavior;
+import javax.jcr.Node;
+import javax.jcr.Property;
+import javax.jcr.Repository;
+import javax.jcr.RepositoryException;
+import javax.jcr.SimpleCredentials;
+import javax.jcr.nodetype.NodeType;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+
+public final class JCRRepositoryRule extends ExternalResource {
+
+    private Repository repository;
+
+    private final Credentials credentials;
+
+    public JCRRepositoryRule() {
+<span class="fc" id="L43">        this(&quot;admin&quot;, &quot;admin&quot;);</span>
+<span class="fc" id="L44">    }</span>
+
+    public JCRRepositoryRule(final String username,
+                             final String password) {
+<span class="fc" id="L48">        this(username, password.toCharArray());</span>
+<span class="fc" id="L49">    }</span>
+
+    public JCRRepositoryRule(final String username,
+<span class="fc" id="L52">                             final char[] password) {</span>
+<span class="fc" id="L53">        credentials = new SimpleCredentials(username, password);</span>
+<span class="fc" id="L54">    }</span>
+
+    @Override
+    public void before() {
+<span class="fc" id="L58">        repository = new Jcr(new Oak()).createRepository();</span>
+<span class="fc" id="L59">    }</span>
+
+    @Override
+    public void after() {
+<span class="fc" id="L63">        repository = null;</span>
+<span class="fc" id="L64">    }</span>
+
+    public Repository getRepository() {
+<span class="fc" id="L67">        return repository;</span>
+    }
+
+    public JCRRepositoryRule createRootFolder(final String name)
+            throws RepositoryException {
+<span class="fc" id="L72">        final var session = repository.login(credentials);</span>
+        try {
+<span class="fc" id="L74">            final var parent = session.getRootNode();</span>
+<span class="fc" id="L75">            parent.addNode(name, NodeType.NT_FOLDER);</span>
+<span class="fc" id="L76">            session.save();</span>
+<span class="fc" id="L77">            return this;</span>
+        } finally {
+<span class="fc" id="L79">            session.logout();</span>
+        }
+    }
+
+    public JCRRepositoryRule createFolder(final String path,
+                                          final String name)
+            throws RepositoryException {
+<span class="fc" id="L86">        final var session = repository.login(credentials);</span>
+        try {
+<span class="fc" id="L88">            final var parent = session.getNode(path);</span>
+<span class="fc" id="L89">            parent.addNode(name, NodeType.NT_FOLDER);</span>
+<span class="fc" id="L90">            session.save();</span>
+<span class="fc" id="L91">            return this;</span>
+        } finally {
+<span class="fc" id="L93">            session.logout();</span>
+        }
+    }
+
+    public JCRRepositoryRule createFile(final String path,
+                                        final String name,
+                                        final String type,
+                                        final String encoding,
+                                        final byte[] data)
+            throws IOException, RepositoryException {
+<span class="fc" id="L103">        try (final var inputStream = new ByteArrayInputStream(data)) {</span>
+<span class="fc" id="L104">            return createFile(path, name, type, encoding, inputStream);</span>
+        }
+    }
+
+    public JCRRepositoryRule createFile(final String path,
+                                        final String name,
+                                        final String type,
+                                        final String encoding,
+                                        final String data)
+            throws IOException, RepositoryException {
+<span class="fc" id="L114">        try (final var inputStream = new ByteArrayInputStream(data.getBytes(StandardCharsets.UTF_8))) {</span>
+<span class="fc" id="L115">            return createFile(path, name, type, encoding, inputStream);</span>
+        }
+    }
+
+    public JCRRepositoryRule createFile(final String path,
+                                        final String name,
+                                        final String type,
+                                        final String encoding,
+                                        final InputStream inputStream)
+            throws RepositoryException {
+<span class="fc" id="L125">        final var session = repository.login(credentials);</span>
+        try {
+<span class="fc" id="L127">            final var valueFactory = session.getValueFactory();</span>
+<span class="fc" id="L128">            final var parent = session.getNode(path);</span>
+<span class="fc" id="L129">            final var file = parent.addNode(name, NodeType.NT_FILE);</span>
+<span class="fc" id="L130">            final var resource = file.addNode(Node.JCR_CONTENT, NodeType.NT_RESOURCE);</span>
+<span class="fc" id="L131">            resource.setProperty(Property.JCR_MIMETYPE, type);</span>
+<span class="fc" id="L132">            resource.setProperty(Property.JCR_ENCODING, encoding);</span>
+<span class="fc" id="L133">            resource.setProperty(Property.JCR_DATA, valueFactory.createBinary(inputStream));</span>
+<span class="fc" id="L134">            session.save();</span>
+        } finally {
+<span class="fc" id="L136">            session.logout();</span>
+        }
+<span class="fc" id="L138">        return this;</span>
+    }
+
+    public JCRRepositoryRule assertFolderExists(final String path) {
+        try {
+<span class="fc" id="L143">            final var session = repository.login(credentials);</span>
+            try {
+<span class="fc" id="L145">                final var node = session.getNode(path);</span>
+<span class="fc bfc" id="L146" title="All 2 branches covered.">                if (!node.isNodeType(NodeType.NT_FOLDER)) {</span>
+<span class="fc" id="L147">                    throw new AssertionError(path + &quot; is not a folder&quot;);</span>
+                }
+            } finally {
+<span class="fc" id="L150">                session.logout();</span>
+            }
+<span class="fc" id="L152">        } catch (final RepositoryException e) {</span>
+<span class="fc" id="L153">            throw new AssertionError(path + &quot; does not exist&quot;, e);</span>
+<span class="fc" id="L154">        }</span>
+<span class="fc" id="L155">        return this;</span>
+    }
+
+    public JCRRepositoryRule assertFileExists(final String path) {
+        try {
+<span class="fc" id="L160">            final var session = repository.login(credentials);</span>
+            try {
+<span class="fc" id="L162">                final var node = session.getNode(path);</span>
+<span class="fc bfc" id="L163" title="All 2 branches covered.">                if (!node.isNodeType(NodeType.NT_FILE)) {</span>
+<span class="fc" id="L164">                    throw new AssertionError(path + &quot; is not a file&quot;);</span>
+                }
+            } finally {
+<span class="fc" id="L167">                session.logout();</span>
+            }
+<span class="fc" id="L169">        } catch (final RepositoryException e) {</span>
+<span class="fc" id="L170">            throw new AssertionError(path + &quot; does not exist&quot;, e);</span>
+<span class="fc" id="L171">        }</span>
+<span class="fc" id="L172">        return this;</span>
+    }
+
+    public JCRRepositoryRule importFromXML(final String path) throws IOException, RepositoryException {
+<span class="fc" id="L176">        return importFromXML(Thread.currentThread().getContextClassLoader().getResourceAsStream(path));</span>
+    }
+
+    public JCRRepositoryRule importFromXML(final InputStream inputStream) throws IOException, RepositoryException {
+<span class="fc" id="L180">        return importFromXML(credentials, inputStream);</span>
+    }
+
+    public JCRRepositoryRule importFromXML(final Credentials credentials, final InputStream inputStream) throws IOException, RepositoryException {
+<span class="fc" id="L184">        final var session = repository.login(credentials);</span>
+        try {
+<span class="fc" id="L186">            session.importXML(&quot;/&quot;, inputStream, ImportUUIDBehavior.IMPORT_UUID_COLLISION_THROW);</span>
+<span class="fc" id="L187">            session.save();</span>
+        } finally {
+<span class="fc" id="L189">            session.logout();</span>
+        }
+<span class="fc" id="L191">        return this;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>
