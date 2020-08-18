@@ -1,6 +1,8 @@
 JCR Unit
 ========
 
+[![Maven Central](https://img.shields.io/maven-central/v/com.btmatthews.jcrunit/jcrunit.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22com.btmatthews.jcrunit%22%20AND%20a:%22jcrunit%22)
+
 **JCR Unit** provides a [JUnit rule](https://github.com/junit-team/junit/wiki/Rules) for use when testing code that
 depends on a [Java Content Repository 2.0](https://jcp.org/en/jsr/detail?id=283) implementation. It creates an in-memory
 content repository using the [Jackrabbit Oak](https://jackrabbit.apache.org/oak/) implementation.
