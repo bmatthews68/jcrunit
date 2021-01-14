@@ -1,0 +1,62 @@
+ ------
+ Introduction
+ ------
+ Brian Matthews
+ ------
+ 2021-01-15
+ ------
+
+~~ Copyright 2015-2021 Brian Thomas Matthews
+~~
+~~ Licensed under the Apache License, Version 2.0 (the "License");
+~~ you may not use this file except in compliance with the License.
+~~ You may obtain a copy of the License at
+~~
+~~     http://www.apache.org/licenses/LICENSE-2.0
+~~
+~~ Unless required by applicable law or agreed to in writing, software
+~~ distributed under the License is distributed on an "AS IS" BASIS,
+~~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+~~ See the License for the specific language governing permissions and
+~~ limitations under the License.
+
+
+JCRUnit
+
+  <<JCRUnit>> makes it easier to create unit tests for components that are dependent on Java Content Repositories:
+
+  * {{{./apidocs/com/btmatthews/jcrunit/JCRRepositoryExtension.html}JCRRepositoryExtension}} is used launch an embedded
+    Java Content Repository so that the unit tests written using JUnit 5 do not have to be dependent on an external Java
+    Content Repository with unpredictable state.
+
+  * {{{./apidocs/com/btmatthews/jcrunit/JCRRepositoryRule.html}JCRRepositoryRule}} is used launch an embedded Java
+    Content Repository so that the unit tests written using JUnit 4 do not have to be dependent on an external Java
+    Content Repository with unpredictable state.
+
+  * {{{./apidocs/com/btmatthews/jcrunit/JCRRepositoryTester.html}JCRRepositoryTester}} is used to connect to a Java
+    Content Repository (embedded or external) and make assertions about or verify the contents of the Java Content
+    Repository.
+
+  []
+
+  JCRUnit relies on {{{https://jackrabbit.apache.org/oak/}Jackrabbit Oak}} to run the embedded Java Content Repository
+  and as the API used to connect to the Java Content Repository.
+
+* Maven Coordinates
+
+  The <<LDAPUnit>> has been published in {{{http://search.maven.org}Maven Central}} at the following
+  coordinates:
+
+-------------------
+<plugin>
+    <groupId>${project.groupId}</groupId>
+    <artifactId>${project.artifactId}</artifactId>
+    <version>${project.version}</version>
+</plugin>
+-------------------
+
+* Licensing and Source Code
+
+  The <<LDAPUnit>> is made available under the
+  {{{http://www.apache.org/licenses/LICENSE-2.0.html}Apache License}} and the source code is hosted on
+  {{{http://github.com}GitHub}} at {{https://github.com/bmatthews68/jcrunit}}.

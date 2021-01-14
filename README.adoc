@@ -1,0 +1,68 @@
+= JCR Unit
+
+image:https://img.shields.io/maven-central/v/com.btmatthews.jcrunit/jcrunit[link=https://search.maven.org/search?q=g:%22com.btmatthews.jcrunit%22%20AND%20a:%22jcrunit%22] image:https://img.shields.io/github/license/bmatthews68/jcrunit[] image:https://img.shields.io/snyk/vulnerabilities/github/bmatthews68/jcrunit[]
+
+*JCR Unit* provides a https://github.com/junit-team/junit/wiki/Rules[JUnit 4 rule] and JUnit 5 extension for use when testing code that depends on a https://jcp.org/en/jsr/detail?id=283[Java Content Repository 2.0] implementation. It creates an in-memory content repository using the https://jackrabbit.apache.org/oak/[Jackrabbit Oak] implementation.
+
+The current release only supports file (`nt:file`) and folder (`nt:folder`) node types.
+
+== Requirements
+
+* Java 8+
+* JUnit 4.13.1+ or JUnit 5.7.0+
+
+== Usage
+
+=== JUnit 4
+
+In JUni
+
+[source,java]
+----
+class RepositoryTest {
+
+    @Rule
+    public JCRRepositoryRule repositoryRule = JCRRepositoryRule.withCredentials("root", "secret".toCharArray()); // <1>
+
+    @Test
+    public void checkSomething() {
+        // ...
+    }
+}
+----
+
+=== JUnit 5
+
+[source,java]
+----
+@ExtendsWith(JCRRepositoryExtension.class)
+@JCRRepositoryConfiguration(username = "root", password = {'s', 'e', 'c', 'r', 'e', 't'}) // <1>
+class RepositoryTest {
+
+    @Test
+    void checkSomething(final JCRRepositoryHelper helper) { // <2>
+        // ...
+    }
+}
+----
+
+== Maven Central Coordinates
+
+**LDAPUnit** has been published in [Maven Central](http://search.maven.org) at the following coordinates:
+
+[source,xml]
+----
+<dependency>
+    <groupId>com.btmatthews.jcrunit</groupId>
+    <artifactId>jcrunit</artifactId>
+    <version>3.0.0</version>
+</dependency>
+----
+
+== Credits
+
+Internally *JCRUnit* is using the https://jackrabbit.apache.org/oak/[Jackrabbit Oak] to run the in-memory content repository.
+
+== License & Source Code
+
+The *JCRUnit* is made available under the http://www.apache.org/licenses/LICENSE-2.0.html[Apache License] and the source code is hosted on http://github.com[GitHub] at https://github.com/bmatthews68/jcrunit.

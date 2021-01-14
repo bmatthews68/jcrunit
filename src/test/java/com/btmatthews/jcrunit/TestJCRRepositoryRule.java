@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2020 Brian Thomas Matthews
+ * Copyright 2015-2021 Brian Thomas Matthews
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,12 +23,11 @@ import javax.jcr.ItemExistsException;
 import javax.jcr.PathNotFoundException;
 import javax.jcr.RepositoryException;
 import java.io.IOException;
-import java.security.SecureRandom;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThrows;
 
-public class TestJCRRepositoryRule {
+public class TestJCRRepositoryRule extends AbstractJCRRepositoryTest {
 
     private static final String DATA_TXT = "data.txt";
     private static final String DATA_FOLDER = "/data";
@@ -76,7 +75,7 @@ public class TestJCRRepositoryRule {
 
     @Test
     public void canCreateBinaryFile() throws IOException, RepositoryException {
-        final var data = generateBinaryData();
+        final byte[] data = generateBinaryData();
         repositoryRule
                 .createRootFolder("bin")
                 .assertFolderExists("/bin")
@@ -126,13 +125,5 @@ public class TestJCRRepositoryRule {
                 .assertFolderExists("/a/b")
                 .assertFileExists("/a/b/c")
                 .assertFolderExists("/a/d");
-    }
-
-    private byte[] generateBinaryData() {
-        final var random = new SecureRandom();
-        final int size = 1024 + random.nextInt(4096);
-        final var data = new byte[size];
-        random.nextBytes(data);
-        return data;
     }
 }
