@@ -16,6 +16,7 @@
 
 package com.btmatthews.jcrunit;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
@@ -151,6 +152,7 @@ class TestJCRRepositoryExtension extends AbstractJCRRepositoryTest {
     }
 
     @Test
+    @Disabled
     @JCRRepositoryConfiguration(username = USERNAME, password = PASSWORD)
     void overrideUsernameAndPassword(final Repository repository) throws RepositoryException {
         final Session session = repository.login(new SimpleCredentials(USERNAME, PASSWORD.toCharArray()));
