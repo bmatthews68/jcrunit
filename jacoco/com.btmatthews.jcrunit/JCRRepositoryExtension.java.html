@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>JCRRepositoryExtension.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">JCR Unit</a> &gt; <a href="index.source.html" class="el_package">com.btmatthews.jcrunit</a> &gt; <span class="el_source">JCRRepositoryExtension.java</span></div><h1>JCRRepositoryExtension.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2021 Brian Thomas Matthews
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.btmatthews.jcrunit;
+
+import org.junit.jupiter.api.extension.AfterTestExecutionCallback;
+import org.junit.jupiter.api.extension.BeforeTestExecutionCallback;
+import org.junit.jupiter.api.extension.ExtensionContext;
+import org.junit.jupiter.api.extension.ParameterContext;
+import org.junit.jupiter.api.extension.ParameterResolutionException;
+import org.junit.jupiter.api.extension.ParameterResolver;
+
+import javax.jcr.Repository;
+import javax.jcr.RepositoryException;
+import java.io.IOException;
+
+/**
+ * JUnit 5 (Jupiter) extension that will start an embedded JCR repository before the test method execution and
+ * stop the embedded JCR repository when the test method completes.
+ *
+ * @author &lt;a href=&quot;mailto:brian@btmatthews.com&quot;&gt;Brian Matthews&lt;/a&gt;
+ * @since 3.0
+ */
+<span class="fc" id="L37">public class JCRRepositoryExtension implements BeforeTestExecutionCallback, AfterTestExecutionCallback, ParameterResolver {</span>
+
+    /**
+     * The name of the property used to cache the reference to the JCR repository helper.
+     */
+    private static final String HELPER = &quot;helper&quot;;
+
+    /**
+     * The name of the property used to cache the reference to the JCR repository.
+     */
+    private static final String REPOSITORY = &quot;repository&quot;;
+
+    /**
+     * This callback is invoked before the test method is executed and is responsible for starting the embedded
+     * JCR repository.
+     *
+     * @param context – the extension context for the Executable about to be invoked; never {@code null}.
+     */
+    @Override
+    public void beforeTestExecution(final ExtensionContext context) {
+<span class="fc" id="L57">        final JCRRepositoryConfiguration annotation = getAnnotation(context);</span>
+<span class="pc bpc" id="L58" title="1 of 2 branches missed.">        if (annotation != null) {</span>
+            try {
+<span class="fc" id="L60">                final JCRRepositoryTester helper = JCRRepositoryTester.createHelper(annotation);</span>
+<span class="fc" id="L61">                final ExtensionContext.Store store = getStore(context);</span>
+<span class="fc" id="L62">                store.put(HELPER, helper);</span>
+<span class="fc" id="L63">                store.put(REPOSITORY, helper.getRepository());</span>
+<span class="nc" id="L64">            } catch (final IOException | RepositoryException e) {</span>
+<span class="nc" id="L65">                throw new AssertionError(&quot;Failed to launch embedded JCR repository&quot;, e);</span>
+<span class="fc" id="L66">            }</span>
+        }
+<span class="fc" id="L68">    }</span>
+
+    /**
+     * This callback is invoked after the test method is executed and is responsible for stopping the embedded
+     * JCR repository.
+     *
+     * @param context – the extension context for the Executable about to be invoked; never {@code null}.
+     */
+    @Override
+    public void afterTestExecution(final ExtensionContext context) {
+<span class="fc" id="L78">        final ExtensionContext.Store store = getStore(context);</span>
+<span class="pc bpc" id="L79" title="1 of 2 branches missed.">        if (store != null) {</span>
+<span class="fc" id="L80">            store.remove(REPOSITORY);</span>
+<span class="fc" id="L81">            store.remove(HELPER);</span>
+        }
+<span class="fc" id="L83">    }</span>
+
+    /**
+     * Check the parameter type is {@link JCRRepositoryTester} or {@link Repository}.
+     *
+     * @param parameterContext The context for the parameter for which an argument should be resolved;
+     *                         never {@code null}.
+     * @param extensionContext The extension context for the Executable about to be invoked; never {@code null}.
+     * @return {@code true} if the parameter type is {@link JCRRepositoryTester} or {@link Repository}.
+     * Otherwise, {@code false}.
+     */
+    @Override
+    public boolean supportsParameter(final ParameterContext parameterContext,
+                                     final ExtensionContext extensionContext) throws ParameterResolutionException {
+<span class="fc" id="L97">        final Class&lt;?&gt; parameterType = parameterContext.getParameter().getType();</span>
+<span class="pc bpc" id="L98" title="1 of 4 branches missed.">        return JCRRepositoryTester.class.equals(parameterType) || Repository.class.equals(parameterType);</span>
+    }
+
+    /**
+     * Resolve {@link JCRRepositoryTester} parameters.
+     *
+     * @param parameterContext The context for the parameter for which an argument should be resolved;
+     *                         never {@code null}.
+     * @param extensionContext –The extension context for the Executable about to be invoked; never {@code null}.
+     * @return The resolved parameter.
+     * @throws ParameterResolutionException If a conneciton to the directory server could not be established.
+     */
+    @Override
+    public Object resolveParameter(final ParameterContext parameterContext,
+                                   final ExtensionContext extensionContext)
+            throws ParameterResolutionException {
+<span class="fc" id="L114">        final Class&lt;?&gt; parameterType = parameterContext.getParameter().getType();</span>
+<span class="fc bfc" id="L115" title="All 2 branches covered.">        if (JCRRepositoryTester.class.equals(parameterType)) {</span>
+<span class="fc" id="L116">            return getStore(extensionContext).get(HELPER, JCRRepositoryTester.class);</span>
+<span class="pc bpc" id="L117" title="1 of 2 branches missed.">        } else if (Repository.class.equals(parameterType)) {</span>
+<span class="fc" id="L118">            return getStore(extensionContext).get(REPOSITORY, Repository.class);</span>
+        } else {
+<span class="nc" id="L120">            return null;</span>
+        }
+    }
+
+    /**
+     * Get teh context storage for the method invocation.
+     *
+     * @param extensionContext – the extension context for the Executable about to be invoked; never {@code null}.
+     * @return The context store.
+     */
+    private ExtensionContext.Store getStore(final ExtensionContext extensionContext) {
+<span class="fc" id="L131">        final ExtensionContext.Namespace namespace = ExtensionContext.Namespace.create(</span>
+                JCRRepositoryExtension.class,
+<span class="fc" id="L133">                extensionContext.getRequiredTestMethod());</span>
+<span class="fc" id="L134">        return extensionContext.getStore(namespace);</span>
+    }
+
+    /**
+     * Locate the annotation that specifies the configuration for the content repository. The annotation is
+     * sought on the test method declaration before falling back to check the test class.
+     *
+     * @param extensionContext – the extension context for the Executable about to be invoked; never {@code null}.
+     * @return The {@code JCRRepositoryConfiguration} annotation if found. Otherwise, {@code null}.
+     */
+    private JCRRepositoryConfiguration getAnnotation(final ExtensionContext extensionContext) {
+<span class="fc" id="L145">        final JCRRepositoryConfiguration annotation = extensionContext.getRequiredTestMethod()</span>
+<span class="fc" id="L146">                .getAnnotation(JCRRepositoryConfiguration.class);</span>
+<span class="fc bfc" id="L147" title="All 2 branches covered.">        if (annotation == null) {</span>
+<span class="fc" id="L148">            return extensionContext.getRequiredTestClass().getAnnotation(JCRRepositoryConfiguration.class);</span>
+        } else {
+<span class="fc" id="L150">            return annotation;</span>
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.6.202009150832</span></div></body></html>

@@ -1,1 +1,1 @@
-typeSearchIndex = [{"l":"All Classes","url":"allclasses-index.html"},{"p":"com.btmatthews.jcrunit","l":"JCRRepositoryRule"}]
+typeSearchIndex = [{"l":"All Classes","url":"allclasses-index.html"},{"p":"com.btmatthews.jcrunit","l":"JCRRepositoryConfiguration"},{"p":"com.btmatthews.jcrunit","l":"JCRRepositoryExtension"},{"p":"com.btmatthews.jcrunit","l":"JCRRepositoryRule"},{"p":"com.btmatthews.jcrunit","l":"JCRRepositoryTester"}]

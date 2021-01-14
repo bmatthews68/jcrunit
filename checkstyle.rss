@@ -23,10 +23,10 @@ under the License.
     <link>https://github.com/bmatthews68/jcrunit</link>
     <description>JCR Unit - Checkstyle report</description>
     <language>en-us</language>
-    <copyright>&#169;2015 - 2020 Brian Matthews</copyright>
+    <copyright>&#169;2015 - 2021 Brian Matthews</copyright>
     <item>
-      <title>File: 1,
-             Errors: 28,
+      <title>File: 4,
+             Errors: 124,
              Warnings: 0,
              Infos: 0
       </title>
@@ -55,7 +55,49 @@ under the License.
                   0
                 </td>
                 <td>
-                  28
+                  37
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bmatthews68/jcrunit/checkstyle.html#com.btmatthews.jcrunit.JCRRepositoryExtension.java">com/btmatthews/jcrunit/JCRRepositoryExtension.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  33
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bmatthews68/jcrunit/checkstyle.html#com.btmatthews.jcrunit.JCRRepositoryTester.java">com/btmatthews/jcrunit/JCRRepositoryTester.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  48
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bmatthews68/jcrunit/checkstyle.html#com.btmatthews.jcrunit.JCRRepositoryConfiguration.java">com/btmatthews/jcrunit/JCRRepositoryConfiguration.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  6
                 </td>
               </tr>
                       </tbody>
