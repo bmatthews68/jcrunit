@@ -16,6 +16,7 @@
 
 package com.btmatthews.jcrunit;
 
+import org.apache.jackrabbit.api.JackrabbitSession;
 import org.apache.jackrabbit.oak.Oak;
 import org.apache.jackrabbit.oak.jcr.Jcr;
 
@@ -51,6 +52,16 @@ import static org.junit.Assert.assertTrue;
 public final class JCRRepositoryTester {
 
     /**
+     * The default username and password.
+     */
+    private static final String ADMIN = "admin";
+
+    /**
+     * The default credentials.
+     */
+    private static final Credentials ADMIN_CREDENTIALS = new SimpleCredentials(ADMIN, ADMIN.toCharArray());
+
+    /**
      * The JCR repository.
      */
     private final Repository repository;
@@ -82,14 +93,22 @@ public final class JCRRepositoryTester {
      * @throws RepositoryException If there was a problem creating repository entries.
      */
     public static JCRRepositoryTester createHelper(final String username,
-                                                   final char[] password,
+                                                   final String password,
                                                    final String[] importXMLs)
             throws IOException, RepositoryException {
-        final Credentials credentials = new SimpleCredentials(username, password);
         final Repository repository = new Jcr(new Oak()).createRepository();
-        final JCRRepositoryTester helper = new JCRRepositoryTester(repository, credentials);
+        if (!ADMIN.equals(username)) {
+            final Session session = repository.login(ADMIN_CREDENTIALS);
+            try {
+                ((JackrabbitSession)session).getUserManager().createUser(username, password);
+                session.save();
+            } finally {
+                session.logout();
+            }
+        }
+        final JCRRepositoryTester helper = new JCRRepositoryTester(repository, new SimpleCredentials(username, password.toCharArray()));
         for (final String path : importXMLs) {
-            helper.importFromXML(path);
+            helper.importFromXML(ADMIN_CREDENTIALS, path);
         }
         return helper;
     }
@@ -104,7 +123,7 @@ public final class JCRRepositoryTester {
      */
     public static JCRRepositoryTester createHelper(final JCRRepositoryConfiguration annotation)
             throws IOException, RepositoryException {
-        return createHelper(annotation.username(), annotation.password().toCharArray(), annotation.importXMLs());
+        return createHelper(annotation.username(), annotation.password(), annotation.importXMLs());
     }
 
     /**
@@ -282,6 +301,22 @@ public final class JCRRepositoryTester {
      */
     public JCRRepositoryTester importFromXML(final String path) throws IOException, RepositoryException {
         return importFromXML(Thread.currentThread().getContextClassLoader().getResourceAsStream(path));
+    }
+
+    /**
+     * Import file and folder nodes into the repository with from an XML resource on the class path using
+     * the specified credentials.
+     *
+     * @param credentials The credentials to use for the operation.
+     * @param path The path of the XML resource on the class path.
+     * @return A reference to <code>this</code> to allow fluent-style chaining of invocations.
+     * @throws IOException         If there was a problem reading the XML resource.
+     * @throws RepositoryException If there was a problem importing the XML resource.
+     */
+    public JCRRepositoryTester importFromXML(final Credentials credentials,
+                                             final String path)
+            throws IOException, RepositoryException {
+        return importFromXML(credentials, Thread.currentThread().getContextClassLoader().getResourceAsStream(path));
     }
 
     /**
