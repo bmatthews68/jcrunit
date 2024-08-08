@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2021 Brian Thomas Matthews
+ * Copyright 2015-2024 Brian Thomas Matthews
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.btmatthews.jcrunit;
+package com.buralotech.oss.jcrunit;
 
 import org.apache.jackrabbit.oak.Oak;
 import org.apache.jackrabbit.oak.jcr.Jcr;

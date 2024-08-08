@@ -3,10 +3,10 @@
  ------
  Brian Matthews
  ------
- 2021-01-15
+ 2024-08-08
  ------
 
-~~ Copyright 2015-2021 Brian Thomas Matthews
+~~ Copyright 2015-2024 Brian Thomas Matthews
 ~~
 ~~ Licensed under the Apache License, Version 2.0 (the "License");
 ~~ you may not use this file except in compliance with the License.
@@ -25,15 +25,15 @@ JCRUnit
 
   <<JCRUnit>> makes it easier to create unit tests for components that are dependent on Java Content Repositories:
 
-  * {{{./apidocs/com/btmatthews/jcrunit/JCRRepositoryExtension.html}JCRRepositoryExtension}} is used launch an embedded
+  * {{{./apidocs/com/buralotech/oss/jcrunit/JCRRepositoryExtension.html}JCRRepositoryExtension}} is used launch an embedded
     Java Content Repository so that the unit tests written using JUnit 5 do not have to be dependent on an external Java
     Content Repository with unpredictable state.
 
-  * {{{./apidocs/com/btmatthews/jcrunit/JCRRepositoryRule.html}JCRRepositoryRule}} is used launch an embedded Java
+  * {{{./apidocs/com/buralotech/oss/jcrunit/JCRRepositoryRule.html}JCRRepositoryRule}} is used launch an embedded Java
     Content Repository so that the unit tests written using JUnit 4 do not have to be dependent on an external Java
     Content Repository with unpredictable state.
 
-  * {{{./apidocs/com/btmatthews/jcrunit/JCRRepositoryTester.html}JCRRepositoryTester}} is used to connect to a Java
+  * {{{./apidocs/com/buralotech/oss/jcrunit/JCRRepositoryTester.html}JCRRepositoryTester}} is used to connect to a Java
     Content Repository (embedded or external) and make assertions about or verify the contents of the Java Content
     Repository.
 

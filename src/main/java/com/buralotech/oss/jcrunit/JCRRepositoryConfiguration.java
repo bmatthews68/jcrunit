@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Brian Thomas Matthews
+ * Copyright 2021-2024 Brian Thomas Matthews
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.btmatthews.jcrunit;
+package com.buralotech.oss.jcrunit;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -24,9 +24,9 @@ import java.lang.annotation.Target;
 /**
  * This annotation is used to specify the parameters used to configure the JCR repository. The
  * annotation can be applied to the test class or method. If the annotation has been applied to both
- * the test class and the test method the the annotation on the test method is used.
+ * the test class and the test method the annotation on the test method is used.
  *
- * @author <a href="mailto:brian@btmatthews.com">Brian Matthews</a>
+ * @author <a href="mailto:bmatthews68@gmail.com">Brian Matthews</a>
  * @since 3.0
  */
 @Target({ElementType.TYPE, ElementType.METHOD})

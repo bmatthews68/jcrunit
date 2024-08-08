@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Brian Thomas Matthews
+ * Copyright 2021-2024 Brian Thomas Matthews
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.btmatthews.jcrunit;
+package com.buralotech.oss.jcrunit;
 
 import org.junit.jupiter.api.extension.AfterTestExecutionCallback;
 import org.junit.jupiter.api.extension.BeforeTestExecutionCallback;
@@ -31,7 +31,7 @@ import java.io.IOException;
  * JUnit 5 (Jupiter) extension that will start an embedded JCR repository before the test method execution and
  * stop the embedded JCR repository when the test method completes.
  *
- * @author <a href="mailto:brian@btmatthews.com">Brian Matthews</a>
+ * @author <a href="mailto:bmatthews68@gmail.com">Brian Matthews</a>
  * @since 3.0
  */
 public class JCRRepositoryExtension implements BeforeTestExecutionCallback, AfterTestExecutionCallback, ParameterResolver {
