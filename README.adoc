@@ -1,6 +1,6 @@
 = JCR Unit
 
-image:https://img.shields.io/maven-central/v/com.buralotech.oss.jcrunit/jcrunit[link=https://search.maven.org/search?q=g:%22com.btmatthews.jcrunit%22%20AND%20a:%22jcrunit%22] image:https://img.shields.io/github/license/bmatthews68/jcrunit[] image:https://img.shields.io/github/actions/workflow/status/bmatthews68/jcrunit/smoke-test[GitHub Actions Workflow Status] image:https://img.shields.io/librariesio/github/bmatthews68/jcrunit[Libraries.io dependency status for GitHub repo]
+image:https://img.shields.io/maven-central/v/com.buralotech.oss.jcrunit/jcrunit[link=https://search.maven.org/search?q=g:%22com.btmatthews.jcrunit%22%20AND%20a:%22jcrunit%22] image:https://img.shields.io/github/license/bmatthews68/jcrunit[] image:https://img.shields.io/github/actions/workflow/status/bmatthews68/jcrunit/maven.yml[GitHub Actions Workflow Status] image:https://img.shields.io/librariesio/github/bmatthews68/jcrunit[Libraries.io dependency status for GitHub repo]
 
 
 *JCR Unit* provides a https://github.com/junit-team/junit/wiki/Rules[JUnit 4 rule] and JUnit 5 extension for use when testing code that depends on a https://jcp.org/en/jsr/detail?id=283[Java Content Repository 2.0] implementation. It creates an in-memory content repository using the https://jackrabbit.apache.org/oak/[Jackrabbit Oak] implementation.
