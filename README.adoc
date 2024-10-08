@@ -9,7 +9,7 @@ The current release only supports file (`nt:file`) and folder (`nt:folder`) node
 == Requirements
 
 * Java 8+
-* JUnit 4.13.1+ or JUnit 5.7.0+
+* JUnit 4.13.2+ or JUnit 5.11.2+
 
 == Usage
 
