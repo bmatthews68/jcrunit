@@ -1,1 +1,1 @@
-typeSearchIndex = [{"p":"com.btmatthews.jcrunit","l":"AbstractJCRRepositoryTest"},{"l":"All Classes","url":"allclasses-index.html"},{"p":"com.btmatthews.jcrunit","l":"TestJCRRepositoryExtension"},{"p":"com.btmatthews.jcrunit","l":"TestJCRRepositoryRule"}]
+typeSearchIndex = [{"p":"com.buralotech.oss.jcrunit","l":"AbstractJCRRepositoryTest"},{"l":"All Classes","url":"allclasses-index.html"},{"p":"com.buralotech.oss.jcrunit","l":"TestJCRRepositoryExtension"},{"p":"com.buralotech.oss.jcrunit","l":"TestJCRRepositoryRule"}]

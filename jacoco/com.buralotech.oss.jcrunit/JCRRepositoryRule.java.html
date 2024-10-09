@@ -1,0 +1,278 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>JCRRepositoryRule.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">JCR Unit</a> &gt; <a href="index.source.html" class="el_package">com.buralotech.oss.jcrunit</a> &gt; <span class="el_source">JCRRepositoryRule.java</span></div><h1>JCRRepositoryRule.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2015-2024 Brian Thomas Matthews
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.buralotech.oss.jcrunit;
+
+import org.apache.jackrabbit.oak.Oak;
+import org.apache.jackrabbit.oak.jcr.Jcr;
+import org.junit.rules.ExternalResource;
+
+import javax.jcr.Credentials;
+import javax.jcr.Repository;
+import javax.jcr.RepositoryException;
+import javax.jcr.SimpleCredentials;
+import java.io.IOException;
+import java.io.InputStream;
+
+/**
+ * A JUnit Rule to help test applications that use the Java Content Repository API. This rule creates an in-memory
+ * content repository using &lt;a href=&quot;https://jackrabbit.apache.org/oak/&quot;&gt;Jackrabbit Oak&lt;/a&gt;.
+ *
+ * @author &lt;a href=&quot;mailto:brian.matthews@buralo.com&quot;&gt;Brian Matthews&lt;/a&gt;
+ * @since 1.0
+ */
+public final class JCRRepositoryRule extends ExternalResource {
+
+    /**
+     * The credentials used to authenticate when connecting to the repository.
+     */
+    private final Credentials credentials;
+
+    /**
+     * The JCR repository helper.
+     */
+    private JCRRepositoryTester repositoryHelper;
+
+    /**
+     * Private constructor to initialise the rule state with the credentials.
+     *
+     * @param credentials The credentials.
+     */
+<span class="fc" id="L54">    private JCRRepositoryRule(final Credentials credentials) {</span>
+<span class="fc" id="L55">        this.credentials = credentials;</span>
+<span class="fc" id="L56">    }</span>
+
+    /**
+     * Factory method to create a {@link JCRRepositoryRule} with default credentials.
+     *
+     * @return The {@link JCRRepositoryRule}.
+     */
+    public static JCRRepositoryRule withDefaultCredentials() {
+<span class="fc" id="L64">        return withCredentials(&quot;admin&quot;, &quot;admin&quot;);</span>
+    }
+
+    /**
+     * Factory method to create a {@link JCRRepositoryRule} with username and password credentials.
+     *
+     * @param username The username.
+     * @param password The password.
+     * @return The {@link JCRRepositoryRule}.
+     */
+    public static JCRRepositoryRule withCredentials(final String username,
+                                                    final String password) {
+<span class="fc" id="L76">        return withCredentials(username, password.toCharArray());</span>
+    }
+
+    /**
+     * Factory method to create a {@link JCRRepositoryRule} with username and password credentials.
+     *
+     * @param username The username.
+     * @param password The password.
+     * @return The {@link JCRRepositoryRule}.
+     */
+    public static JCRRepositoryRule withCredentials(final String username,
+                                                    final char[] password) {
+<span class="fc" id="L88">        return withCredentials(new SimpleCredentials(username, password));</span>
+    }
+
+    /**
+     * Factory method to create a {@link JCRRepositoryRule} with custom credentials.
+     *
+     * @param credentials The custom credentials.
+     * @return The {@link JCRRepositoryRule}.
+     */
+    public static JCRRepositoryRule withCredentials(final Credentials credentials) {
+<span class="fc" id="L98">        return new JCRRepositoryRule(credentials);</span>
+    }
+
+    /**
+     * Invoked by JUnit before the test case is run and is responsible for instantiating the in-memory JCR
+     * repository.
+     */
+    @Override
+    public void before() {
+<span class="fc" id="L107">        repositoryHelper = new JCRRepositoryTester(new Jcr(new Oak()).createRepository(), credentials);</span>
+<span class="fc" id="L108">    }</span>
+
+    /**
+     * Invoked by JUnit after test case has completed and is responsible for resetting the rule allowing the
+     * in-memory JCR repository to be garbage collected.
+     */
+    @Override
+    public void after() {
+<span class="fc" id="L116">        repositoryHelper = null;</span>
+<span class="fc" id="L117">    }</span>
+
+    /**
+     * Return the JCR repository.
+     *
+     * @return The JCR repository.
+     */
+    public Repository getRepository() {
+<span class="fc" id="L125">        return repositoryHelper.getRepository();</span>
+    }
+
+    /**
+     * Create a top-level folder in the repository.
+     *
+     * @param name The name of the new top-level folder to be created.
+     * @return A reference to &lt;code&gt;this&lt;/code&gt; to allow fluent-style chaining of invocations.
+     */
+    public JCRRepositoryRule createRootFolder(final String name)
+            throws RepositoryException {
+<span class="fc" id="L136">        repositoryHelper.createRootFolder(name);</span>
+<span class="fc" id="L137">        return this;</span>
+    }
+
+    /**
+     * Create a sub-folder in the repository.
+     *
+     * @param path The fully qualified path of the parent folder.
+     * @param name The name of the new sub-folder to be created.
+     * @return A reference to &lt;code&gt;this&lt;/code&gt; to allow fluent-style chaining of invocations.
+     */
+    public JCRRepositoryRule createFolder(final String path,
+                                          final String name)
+            throws RepositoryException {
+<span class="fc" id="L150">        repositoryHelper.createFolder(path, name);</span>
+<span class="fc" id="L151">        return this;</span>
+    }
+
+    /**
+     * Create a file in the repository.
+     *
+     * @param path     The fully qualified path of the parent folder.
+     * @param name     The name of the file to be created.
+     * @param type     The content type of the file.
+     * @param encoding The content encoding of the file.
+     * @param data     The binary content of the file.
+     * @return A reference to &lt;code&gt;this&lt;/code&gt; to allow fluent-style chaining of invocations.
+     */
+    public JCRRepositoryRule createFile(final String path,
+                                        final String name,
+                                        final String type,
+                                        final String encoding,
+                                        final byte[] data)
+            throws IOException, RepositoryException {
+<span class="fc" id="L170">        repositoryHelper.createFile(path, name, type, encoding, data);</span>
+<span class="fc" id="L171">        return this;</span>
+    }
+
+    /**
+     * Create a file in the repository.
+     *
+     * @param path     The fully qualified path of the parent folder.
+     * @param name     The name of the file to be created.
+     * @param type     The content type of the file.
+     * @param encoding The content encoding of the file.
+     * @param data     The string content of the file.
+     * @return A reference to &lt;code&gt;this&lt;/code&gt; to allow fluent-style chaining of invocations.
+     */
+    public JCRRepositoryRule createFile(final String path,
+                                        final String name,
+                                        final String type,
+                                        final String encoding,
+                                        final String data)
+            throws IOException, RepositoryException {
+<span class="fc" id="L190">        repositoryHelper.createFile(path, name, type, encoding, data);</span>
+<span class="fc" id="L191">        return this;</span>
+    }
+
+    /**
+     * Create a file in the repository.
+     *
+     * @param path        The fully qualified path of the parent folder.
+     * @param name        The name of the file to be created.
+     * @param type        The content type of the file.
+     * @param encoding    The content encoding of the file.
+     * @param inputStream The input stream that provides the binary content of the file.
+     * @return A reference to &lt;code&gt;this&lt;/code&gt; to allow fluent-style chaining of invocations.
+     */
+    public JCRRepositoryRule createFile(final String path,
+                                        final String name,
+                                        final String type,
+                                        final String encoding,
+                                        final InputStream inputStream)
+            throws RepositoryException {
+<span class="nc" id="L210">        repositoryHelper.createFile(path, name, type, encoding, inputStream);</span>
+<span class="nc" id="L211">        return this;</span>
+    }
+
+    /**
+     * Assert that a folder exists in the repository.
+     *
+     * @param path The fully qualified path of the folder.
+     * @return A reference to &lt;code&gt;this&lt;/code&gt; to allow fluent-style chaining of invocations.
+     */
+    public JCRRepositoryRule assertFolderExists(final String path) {
+<span class="fc" id="L221">        repositoryHelper.assertFolderExists(path);</span>
+<span class="fc" id="L222">        return this;</span>
+    }
+
+    /**
+     * Assert that a file exists in the repository.
+     *
+     * @param path The fully qualified path of the file.
+     * @return A reference to &lt;code&gt;this&lt;/code&gt; to allow fluent-style chaining of invocations.
+     */
+    public JCRRepositoryRule assertFileExists(final String path) {
+<span class="fc" id="L232">        repositoryHelper.assertFileExists(path);</span>
+<span class="fc" id="L233">        return this;</span>
+    }
+
+    /**
+     * Import file and folder nodes into the repository with from an XML resource on the class path.
+     *
+     * @param path The path of the XML resource on the class path.
+     * @return A reference to &lt;code&gt;this&lt;/code&gt; to allow fluent-style chaining of invocations.
+     * @throws IOException         If there was a problem reading the XML resource.
+     * @throws RepositoryException If there was a problem importing the XML resource.
+     */
+    public JCRRepositoryRule importFromXML(final String path) throws IOException, RepositoryException {
+<span class="fc" id="L245">        repositoryHelper.importFromXML(path);</span>
+<span class="fc" id="L246">        return this;</span>
+    }
+
+    /**
+     * Import file and folder nodes into the repository with from an XML resource loaded from an input stream.
+     *
+     * @param inputStream The input stream from which the XML resource can be loaded.
+     * @return A reference to &lt;code&gt;this&lt;/code&gt; to allow fluent-style chaining of invocations.
+     * @throws IOException         If there was a problem reading the XML resource.
+     * @throws RepositoryException If there was a problem importing the XML resource.
+     */
+    public JCRRepositoryRule importFromXML(final InputStream inputStream) throws IOException, RepositoryException {
+<span class="nc" id="L258">        repositoryHelper.importFromXML(inputStream);</span>
+<span class="nc" id="L259">        return this;</span>
+    }
+
+    /**
+     * Import file and folder nodes into the repository with from an XML resource loaded from an input stream using
+     * the specified credentials.
+     *
+     * @param credentials The credentials to use for the operation.
+     * @param inputStream The input stream from which the XML resource can be loaded.
+     * @return A reference to &lt;code&gt;this&lt;/code&gt; to allow fluent-style chaining of invocations.
+     * @throws IOException         If there was a problem reading the XML resource.
+     * @throws RepositoryException If there was a problem importing the XML resource.
+     */
+    public JCRRepositoryRule importFromXML(final Credentials credentials, final InputStream inputStream)
+            throws IOException, RepositoryException {
+<span class="nc" id="L274">        repositoryHelper.importFromXML(credentials, inputStream);</span>
+<span class="nc" id="L275">        return this;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>
