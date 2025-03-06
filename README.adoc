@@ -36,7 +36,7 @@ class RepositoryTest {
 
 [source,java]
 ----
-@ExtendsWith(JCRRepositoryExtension.class)
+@ExtendWith(JCRRepositoryExtension.class)
 @JCRRepositoryConfiguration(username = "root", password = {'s', 'e', 'c', 'r', 'e', 't'}) // <1>
 class RepositoryTest {
 
@@ -49,7 +49,7 @@ class RepositoryTest {
 
 == Maven Central Coordinates
 
-**LDAPUnit** has been published in [Maven Central](http://search.maven.org) at the following coordinates:
+**JCRUnit** has been published in [Maven Central](http://search.maven.org) at the following coordinates:
 
 [source,xml]
 ----
