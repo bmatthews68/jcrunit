@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2024 Brian Thomas Matthews
+ * Copyright 2015-2025 Brian Thomas Matthews
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@ import javax.jcr.PathNotFoundException;
 import javax.jcr.RepositoryException;
 import java.io.IOException;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThrows;
 
@@ -125,5 +126,14 @@ public class TestJCRRepositoryRule extends AbstractJCRRepositoryTest {
                 .assertFolderExists("/a/b")
                 .assertFileExists("/a/b/c")
                 .assertFolderExists("/a/d");
+    }
+
+    @Test
+    public void purge() throws RepositoryException {
+        assertThat(repositoryRule.purge())
+                .pathDoesNotExist("/a")
+                .pathDoesNotExist("/a/b")
+                .pathDoesNotExist("/a/b/c")
+                .pathDoesNotExist("/a/d");
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2024 Brian Thomas Matthews
+ * Copyright 2021-2025 Brian Thomas Matthews
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,6 +27,7 @@ import javax.jcr.Session;
 import javax.jcr.SimpleCredentials;
 import java.io.IOException;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -156,5 +157,15 @@ class TestJCRRepositoryExtension extends AbstractJCRRepositoryTest {
         final Session session = repository.login(new SimpleCredentials(USERNAME, PASSWORD.toCharArray()));
         assertNotNull(session);
         session.logout();
+    }
+
+    @Test
+    @JCRRepositoryConfiguration(importXMLs = "data.xml")
+    void purge(final JCRRepositoryTester helper) throws RepositoryException {
+        assertThat(helper.purge())
+                .pathDoesNotExist("/a")
+                .pathDoesNotExist("/a/b")
+                .pathDoesNotExist("/a/b/c")
+                .pathDoesNotExist("/a/d");
     }
 }

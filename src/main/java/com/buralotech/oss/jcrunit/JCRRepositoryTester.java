@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2024 Brian Thomas Matthews
+ * Copyright 2015-2025 Brian Thomas Matthews
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,14 +19,9 @@ package com.buralotech.oss.jcrunit;
 import org.apache.jackrabbit.api.JackrabbitSession;
 import org.apache.jackrabbit.oak.Oak;
 import org.apache.jackrabbit.oak.jcr.Jcr;
+import org.assertj.core.api.AssertProvider;
 
-import javax.jcr.Credentials;
-import javax.jcr.Node;
-import javax.jcr.Repository;
-import javax.jcr.RepositoryException;
-import javax.jcr.Session;
-import javax.jcr.SimpleCredentials;
-import javax.jcr.ValueFactory;
+import javax.jcr.*;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -34,12 +29,8 @@ import java.nio.charset.StandardCharsets;
 
 import static javax.jcr.ImportUUIDBehavior.IMPORT_UUID_COLLISION_THROW;
 import static javax.jcr.Node.JCR_CONTENT;
-import static javax.jcr.Property.JCR_DATA;
-import static javax.jcr.Property.JCR_ENCODING;
-import static javax.jcr.Property.JCR_MIMETYPE;
-import static javax.jcr.nodetype.NodeType.NT_FILE;
-import static javax.jcr.nodetype.NodeType.NT_FOLDER;
-import static javax.jcr.nodetype.NodeType.NT_RESOURCE;
+import static javax.jcr.Property.*;
+import static javax.jcr.nodetype.NodeType.*;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -49,7 +40,12 @@ import static org.junit.Assert.assertTrue;
  * @author <a href="mailto:brian.matthews@buralo.com">Brian Matthews</a>
  * @since 3.0
  */
-public final class JCRRepositoryTester {
+public final class JCRRepositoryTester implements AssertProvider<JCRAssertions> {
+
+    @FunctionalInterface
+    public interface CreationCallback {
+        void accept(Node node) throws RepositoryException;
+    }
 
     /**
      * The default username and password.
@@ -72,14 +68,21 @@ public final class JCRRepositoryTester {
     private final Credentials credentials;
 
     /**
+     * Indicates if the created nodes should be referenceable.
+     */
+    private final boolean referenceable;
+
+    /**
      * Initialise the helper state with the repository and credentials.
      *
      * @param credentials The credentials.
      */
     public JCRRepositoryTester(final Repository repository,
-                               final Credentials credentials) {
+                               final Credentials credentials,
+                               final boolean referenceable) {
         this.repository = repository;
         this.credentials = credentials;
+        this.referenceable = referenceable;
     }
 
     /**
@@ -94,19 +97,20 @@ public final class JCRRepositoryTester {
      */
     public static JCRRepositoryTester createHelper(final String username,
                                                    final String password,
+                                                   final boolean referenceable,
                                                    final String[] importXMLs)
             throws IOException, RepositoryException {
         final Repository repository = new Jcr(new Oak()).createRepository();
         if (!ADMIN.equals(username)) {
             final Session session = repository.login(ADMIN_CREDENTIALS);
             try {
-                ((JackrabbitSession)session).getUserManager().createUser(username, password);
+                ((JackrabbitSession) session).getUserManager().createUser(username, password);
                 session.save();
             } finally {
                 session.logout();
             }
         }
-        final JCRRepositoryTester helper = new JCRRepositoryTester(repository, new SimpleCredentials(username, password.toCharArray()));
+        final JCRRepositoryTester helper = new JCRRepositoryTester(repository, new SimpleCredentials(username, password.toCharArray()), referenceable);
         for (final String path : importXMLs) {
             helper.importFromXML(ADMIN_CREDENTIALS, path);
         }
@@ -123,7 +127,7 @@ public final class JCRRepositoryTester {
      */
     public static JCRRepositoryTester createHelper(final JCRRepositoryConfiguration annotation)
             throws IOException, RepositoryException {
-        return createHelper(annotation.username(), annotation.password(), annotation.importXMLs());
+        return createHelper(annotation.username(), annotation.password(), annotation.referenceable(), annotation.importXMLs());
     }
 
     /**
@@ -135,19 +139,30 @@ public final class JCRRepositoryTester {
         return repository;
     }
 
+    public Credentials getCredentials() {
+        return credentials;
+    }
+
     /**
      * Create a top-level folder in the repository.
      *
      * @param name The name of the new top-level folder to be created.
-     * @return A reference to <code>this</code> to allow fluent-style chaining of invocations.
+     * @return A reference to {@code this} to allow fluent-style chaining of invocations.
      */
-    public JCRRepositoryTester createRootFolder(final String name)
+    public JCRRepositoryTester createRootFolder(final String name,
+                                                final CreationCallback... callbacks)
             throws RepositoryException {
         final Session session = repository.login(credentials);
         try {
-            final Node parent = session.getRootNode();
-            parent.addNode(name, NT_FOLDER);
+            final var parent = session.getRootNode();
+            final var node = parent.addNode(name, NT_FOLDER);
+            if (referenceable) {
+                node.addMixin(MIX_REFERENCEABLE);
+            }
             session.save();
+            for (var callback : callbacks) {
+                callback.accept(node);
+            }
         } finally {
             session.logout();
         }
@@ -159,16 +174,23 @@ public final class JCRRepositoryTester {
      *
      * @param path The fully qualified path of the parent folder.
      * @param name The name of the new sub-folder to be created.
-     * @return A reference to <code>this</code> to allow fluent-style chaining of invocations.
+     * @return A reference to {@code this} to allow fluent-style chaining of invocations.
      */
     public JCRRepositoryTester createFolder(final String path,
-                                            final String name)
+                                            final String name,
+                                            final CreationCallback... callbacks)
             throws RepositoryException {
         final Session session = repository.login(credentials);
         try {
-            final Node parent = session.getNode(path);
-            parent.addNode(name, NT_FOLDER);
+            final var parent = session.getNode(path);
+            final var node = parent.addNode(name, NT_FOLDER);
+            if (referenceable) {
+                node.addMixin(MIX_REFERENCEABLE);
+            }
             session.save();
+            for (var callback : callbacks) {
+                callback.accept(node);
+            }
         } finally {
             session.logout();
         }
@@ -183,16 +205,17 @@ public final class JCRRepositoryTester {
      * @param type     The content type of the file.
      * @param encoding The content encoding of the file.
      * @param data     The binary content of the file.
-     * @return A reference to <code>this</code> to allow fluent-style chaining of invocations.
+     * @return A reference to {@code this} to allow fluent-style chaining of invocations.
      */
     public JCRRepositoryTester createFile(final String path,
                                           final String name,
                                           final String type,
                                           final String encoding,
-                                          final byte[] data)
+                                          final byte[] data,
+                                          final CreationCallback... callbacks)
             throws IOException, RepositoryException {
         try (final InputStream inputStream = new ByteArrayInputStream(data)) {
-            return createFile(path, name, type, encoding, inputStream);
+            return createFile(path, name, type, encoding, inputStream, callbacks);
         }
     }
 
@@ -204,13 +227,14 @@ public final class JCRRepositoryTester {
      * @param type     The content type of the file.
      * @param encoding The content encoding of the file.
      * @param data     The string content of the file.
-     * @return A reference to <code>this</code> to allow fluent-style chaining of invocations.
+     * @return A reference to {@code this} to allow fluent-style chaining of invocations.
      */
     public JCRRepositoryTester createFile(final String path,
                                           final String name,
                                           final String type,
                                           final String encoding,
-                                          final String data)
+                                          final String data,
+                                          final CreationCallback... callbacks)
             throws IOException, RepositoryException {
         try (final InputStream inputStream = new ByteArrayInputStream(data.getBytes(StandardCharsets.UTF_8))) {
             return createFile(path, name, type, encoding, inputStream);
@@ -225,24 +249,31 @@ public final class JCRRepositoryTester {
      * @param type        The content type of the file.
      * @param encoding    The content encoding of the file.
      * @param inputStream The input stream that provides the binary content of the file.
-     * @return A reference to <code>this</code> to allow fluent-style chaining of invocations.
+     * @return A reference to {@code this} to allow fluent-style chaining of invocations.
      */
     public JCRRepositoryTester createFile(final String path,
                                           final String name,
                                           final String type,
                                           final String encoding,
-                                          final InputStream inputStream)
+                                          final InputStream inputStream,
+                                          final CreationCallback... callbacks)
             throws RepositoryException {
         final Session session = repository.login(credentials);
         try {
             final ValueFactory valueFactory = session.getValueFactory();
             final Node parent = session.getNode(path);
             final Node file = parent.addNode(name, NT_FILE);
+            if (referenceable) {
+                file.addMixin(MIX_REFERENCEABLE);
+            }
             final Node resource = file.addNode(JCR_CONTENT, NT_RESOURCE);
             resource.setProperty(JCR_MIMETYPE, type);
             resource.setProperty(JCR_ENCODING, encoding);
             resource.setProperty(JCR_DATA, valueFactory.createBinary(inputStream));
             session.save();
+            for (var callback : callbacks) {
+                callback.accept(file);
+            }
         } finally {
             session.logout();
         }
@@ -253,7 +284,7 @@ public final class JCRRepositoryTester {
      * Assert that a folder exists in the repository.
      *
      * @param path The fully qualified path of the folder.
-     * @return A reference to <code>this</code> to allow fluent-style chaining of invocations.
+     * @return A reference to {@code this} to allow fluent-style chaining of invocations.
      */
     public JCRRepositoryTester assertFolderExists(final String path) {
         try {
@@ -274,7 +305,7 @@ public final class JCRRepositoryTester {
      * Assert that a file exists in the repository.
      *
      * @param path The fully qualified path of the file.
-     * @return A reference to <code>this</code> to allow fluent-style chaining of invocations.
+     * @return A reference to {@code this} to allow fluent-style chaining of invocations.
      */
     public JCRRepositoryTester assertFileExists(final String path) {
         try {
@@ -295,7 +326,7 @@ public final class JCRRepositoryTester {
      * Import file and folder nodes into the repository with from an XML resource on the class path.
      *
      * @param path The path of the XML resource on the class path.
-     * @return A reference to <code>this</code> to allow fluent-style chaining of invocations.
+     * @return A reference to {@code this} to allow fluent-style chaining of invocations.
      * @throws IOException         If there was a problem reading the XML resource.
      * @throws RepositoryException If there was a problem importing the XML resource.
      */
@@ -308,8 +339,8 @@ public final class JCRRepositoryTester {
      * the specified credentials.
      *
      * @param credentials The credentials to use for the operation.
-     * @param path The path of the XML resource on the class path.
-     * @return A reference to <code>this</code> to allow fluent-style chaining of invocations.
+     * @param path        The path of the XML resource on the class path.
+     * @return A reference to {@code this} to allow fluent-style chaining of invocations.
      * @throws IOException         If there was a problem reading the XML resource.
      * @throws RepositoryException If there was a problem importing the XML resource.
      */
@@ -323,7 +354,7 @@ public final class JCRRepositoryTester {
      * Import file and folder nodes into the repository with from an XML resource loaded from an input stream.
      *
      * @param inputStream The input stream from which the XML resource can be loaded.
-     * @return A reference to <code>this</code> to allow fluent-style chaining of invocations.
+     * @return A reference to {@code this} to allow fluent-style chaining of invocations.
      * @throws IOException         If there was a problem reading the XML resource.
      * @throws RepositoryException If there was a problem importing the XML resource.
      */
@@ -337,7 +368,7 @@ public final class JCRRepositoryTester {
      *
      * @param credentials The credentials to use for the operation.
      * @param inputStream The input stream from which the XML resource can be loaded.
-     * @return A reference to <code>this</code> to allow fluent-style chaining of invocations.
+     * @return A reference to {@code this} to allow fluent-style chaining of invocations.
      * @throws IOException         If there was a problem reading the XML resource.
      * @throws RepositoryException If there was a problem importing the XML resource.
      */
@@ -351,5 +382,55 @@ public final class JCRRepositoryTester {
             session.logout();
         }
         return this;
+    }
+
+    /**
+     * Verify that a node exists.
+     *
+     * @param path The absolute path of the node.
+     * @return {@code true} if the node exists. Otherwise, {@code false}.
+     * @throws RepositoryException If there was a problem verifying that the node exists.
+     */
+    public boolean exists(final String path) throws RepositoryException {
+        final Session session = repository.login(credentials);
+        try {
+            return session.nodeExists(path);
+        } finally {
+            session.logout();
+        }
+    }
+
+    /**
+     * Purge all the files and folders added to the repository.
+     *
+     * @return A reference to {@code this} to allow fluent-style chaining of invocations.
+     * @throws RepositoryException If there was a problem purging the files and folders added to the repository.
+     */
+    public JCRRepositoryTester purge() throws RepositoryException {
+        final Session session = repository.login(credentials);
+        try {
+            final var root = session.getRootNode();
+            final var nodes = root.getNodes();
+            while (nodes.hasNext()) {
+                var node = nodes.nextNode();
+                if (node.isNodeType(NT_FOLDER) || node.isNodeType(NT_FILE)) {
+                    node.remove();
+                }
+            }
+            session.save();
+        } finally {
+            session.logout();
+        }
+        return this;
+    }
+
+    /**
+     * Provide the assertions object.
+     *
+     * @return The assertions object.
+     */
+    @Override
+    public JCRAssertions assertThat() {
+        return new JCRAssertions(this);
     }
 }

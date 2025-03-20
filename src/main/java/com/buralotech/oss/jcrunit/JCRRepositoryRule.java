@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2024 Brian Thomas Matthews
+ * Copyright 2015-2025 Brian Thomas Matthews
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package com.buralotech.oss.jcrunit;
 
 import org.apache.jackrabbit.oak.Oak;
 import org.apache.jackrabbit.oak.jcr.Jcr;
+import org.assertj.core.api.AssertProvider;
 import org.junit.rules.ExternalResource;
 
 import javax.jcr.Credentials;
@@ -34,7 +35,7 @@ import java.io.InputStream;
  * @author <a href="mailto:brian.matthews@buralo.com">Brian Matthews</a>
  * @since 1.0
  */
-public final class JCRRepositoryRule extends ExternalResource {
+public final class JCRRepositoryRule extends ExternalResource implements AssertProvider<JCRAssertions> {
 
     /**
      * The credentials used to authenticate when connecting to the repository.
@@ -45,6 +46,11 @@ public final class JCRRepositoryRule extends ExternalResource {
      * The JCR repository helper.
      */
     private JCRRepositoryTester repositoryHelper;
+
+    /**
+     * Indicates whether nodes created in the repository should be referenceable.
+     */
+    private boolean referenceable;
 
     /**
      * Private constructor to initialise the rule state with the credentials.
@@ -98,13 +104,18 @@ public final class JCRRepositoryRule extends ExternalResource {
         return new JCRRepositoryRule(credentials);
     }
 
+    public JCRRepositoryRule withReferenable(final boolean referenceable) {
+        this.referenceable = referenceable;
+        return this;
+    }
+
     /**
      * Invoked by JUnit before the test case is run and is responsible for instantiating the in-memory JCR
      * repository.
      */
     @Override
     public void before() {
-        repositoryHelper = new JCRRepositoryTester(new Jcr(new Oak()).createRepository(), credentials);
+        repositoryHelper = new JCRRepositoryTester(new Jcr(new Oak()).createRepository(), credentials, referenceable);
     }
 
     /**
@@ -273,5 +284,15 @@ public final class JCRRepositoryRule extends ExternalResource {
             throws IOException, RepositoryException {
         repositoryHelper.importFromXML(credentials, inputStream);
         return this;
+    }
+
+    public JCRRepositoryRule purge() throws RepositoryException {
+        repositoryHelper.purge();
+        return this;
+    }
+
+    @Override
+    public JCRAssertions assertThat() {
+        return repositoryHelper.assertThat();
     }
 }

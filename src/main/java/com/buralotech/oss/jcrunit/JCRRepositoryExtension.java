@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2024 Brian Thomas Matthews
+ * Copyright 2021-2025 Brian Thomas Matthews
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,12 +16,7 @@
 
 package com.buralotech.oss.jcrunit;
 
-import org.junit.jupiter.api.extension.AfterTestExecutionCallback;
-import org.junit.jupiter.api.extension.BeforeTestExecutionCallback;
-import org.junit.jupiter.api.extension.ExtensionContext;
-import org.junit.jupiter.api.extension.ParameterContext;
-import org.junit.jupiter.api.extension.ParameterResolutionException;
-import org.junit.jupiter.api.extension.ParameterResolver;
+import org.junit.jupiter.api.extension.*;
 
 import javax.jcr.Repository;
 import javax.jcr.RepositoryException;
@@ -34,7 +29,7 @@ import java.io.IOException;
  * @author <a href="mailto:bmatthews68@gmail.com">Brian Matthews</a>
  * @since 3.0
  */
-public class JCRRepositoryExtension implements BeforeTestExecutionCallback, AfterTestExecutionCallback, ParameterResolver {
+public class JCRRepositoryExtension implements BeforeEachCallback, AfterEachCallback, ParameterResolver {
 
     /**
      * The name of the property used to cache the reference to the JCR repository helper.
@@ -53,7 +48,7 @@ public class JCRRepositoryExtension implements BeforeTestExecutionCallback, Afte
      * @param context – the extension context for the Executable about to be invoked; never {@code null}.
      */
     @Override
-    public void beforeTestExecution(final ExtensionContext context) {
+    public void beforeEach(final ExtensionContext context) {
         final JCRRepositoryConfiguration annotation = getAnnotation(context);
         if (annotation != null) {
             try {
@@ -74,7 +69,7 @@ public class JCRRepositoryExtension implements BeforeTestExecutionCallback, Afte
      * @param context – the extension context for the Executable about to be invoked; never {@code null}.
      */
     @Override
-    public void afterTestExecution(final ExtensionContext context) {
+    public void afterEach(final ExtensionContext context) {
         final ExtensionContext.Store store = getStore(context);
         if (store != null) {
             store.remove(REPOSITORY);
