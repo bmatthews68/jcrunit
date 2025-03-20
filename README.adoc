@@ -9,14 +9,12 @@ The current release only supports file (`nt:file`) and folder (`nt:folder`) node
 
 == Requirements
 
-* Java 8+
-* JUnit 4.13.2+ or JUnit 5.11.2+
+* Java 21+
+* JUnit 4.13.2+ or JUnit 5.11.4+
 
 == Usage
 
 === JUnit 4
-
-In JUni
 
 [source,java]
 ----
@@ -31,21 +29,25 @@ class RepositoryTest {
     }
 }
 ----
+<1> Create a rule and configure the username/password credentials.
 
 === JUnit 5
 
 [source,java]
 ----
-@ExtendWith(JCRRepositoryExtension.class)
-@JCRRepositoryConfiguration(username = "root", password = {'s', 'e', 'c', 'r', 'e', 't'}) // <1>
+@ExtendWith(JCRRepositoryExtension.class) // <1>
+@JCRRepositoryConfiguration(username = "root", password = {'s', 'e', 'c', 'r', 'e', 't'}) // <2>
 class RepositoryTest {
 
     @Test
-    void checkSomething(final JCRRepositoryHelper helper) { // <2>
+    void checkSomething(final JCRRepositoryTester helper) { // <3>
         // ...
     }
 }
 ----
+<1> Register the extension
+<2> Configure repository with the username/password credentials
+<3> Inject a freshly created `JCRRepositoryTestar`
 
 == Maven Central Coordinates
 
@@ -56,7 +58,7 @@ class RepositoryTest {
 <dependency>
     <groupId>com.buraolotech.oss.jcrunit</groupId>
     <artifactId>jcrunit</artifactId>
-    <version>3.0.0</version>
+    <version>4.0.0</version>
 </dependency>
 ----
 
