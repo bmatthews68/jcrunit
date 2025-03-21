@@ -21,12 +21,10 @@ import org.apache.jackrabbit.oak.jcr.Jcr;
 import org.assertj.core.api.AssertProvider;
 import org.junit.rules.ExternalResource;
 
-import javax.jcr.Credentials;
-import javax.jcr.Repository;
-import javax.jcr.RepositoryException;
-import javax.jcr.SimpleCredentials;
+import javax.jcr.*;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Optional;
 
 /**
  * A JUnit Rule to help test applications that use the Java Content Repository API. This rule creates an in-memory
@@ -290,6 +288,49 @@ public final class JCRRepositoryRule extends ExternalResource implements AssertP
         repositoryHelper.purge();
         return this;
     }
+
+    /**
+     * Verify that the node at the specified path is the expected type.
+     *
+     * @param path     The path.
+     * @param nodeType The expected type.
+     * @return {@code true} if the node has the expected type. Otherwise, {@code false}.
+     * @throws RepositoryException If there was a problem verifying that the node type.
+     */
+    public boolean isType(final String path,
+                          final String nodeType)
+            throws RepositoryException {
+        return repositoryHelper.isType(path, nodeType);
+    }
+
+    /**
+     * Verify that the node at the specified path has the named property.
+     *
+     * @param path         The path.
+     * @param propertyName The property name.
+     * @return {@code true} if the node has the named property. Otherwise, {@code false}.
+     * @throws RepositoryException If there was a problem verifying that the node has the named property.
+     */
+    public boolean propertyExists(final String path,
+                                  final String propertyName)
+            throws RepositoryException {
+        return repositoryHelper.propertyExists(path, propertyName);
+    }
+
+    /**
+     * Get the named property for the node at the specified path.
+     *
+     * @param path         The path.
+     * @param propertyName The property name.
+     * @return The property value.
+     * @throws RepositoryException If there was a problem getting the property.
+     */
+    public <T> Optional<Property> property(final String path,
+                                           final String propertyName)
+            throws RepositoryException {
+        return repositoryHelper.property(path, propertyName);
+    }
+
 
     @Override
     public JCRAssertions assertThat() {

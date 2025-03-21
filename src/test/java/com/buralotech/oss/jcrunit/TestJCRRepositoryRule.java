@@ -21,10 +21,15 @@ import org.junit.Test;
 
 import javax.jcr.ItemExistsException;
 import javax.jcr.PathNotFoundException;
+import javax.jcr.Property;
 import javax.jcr.RepositoryException;
 import java.io.IOException;
+import java.util.function.Consumer;
 
+import static javax.jcr.nodetype.NodeType.NT_FILE;
+import static javax.jcr.nodetype.NodeType.NT_FOLDER;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThrows;
 
@@ -135,5 +140,44 @@ public class TestJCRRepositoryRule extends AbstractJCRRepositoryTest {
                 .pathDoesNotExist("/a/b")
                 .pathDoesNotExist("/a/b/c")
                 .pathDoesNotExist("/a/d");
+    }
+
+
+    @Test
+    public void verifyIsType() throws Exception {
+        repositoryRule.importFromXML("data.xml");
+        assertThat(repositoryRule.isType("/a/b", NT_FILE)).isFalse();
+        assertThat(repositoryRule.isType("/a/b", NT_FOLDER)).isTrue();
+        assertThat(repositoryRule.isType("/a/b/c", NT_FILE)).isTrue();
+        assertThat(repositoryRule.isType("/a/b/c", NT_FOLDER)).isFalse();
+        assertThat(repositoryRule.isType("/a/d", NT_FILE)).isFalse();
+        assertThat(repositoryRule.isType("/a/d", NT_FOLDER)).isTrue();
+    }
+
+    @Test
+    public void verifyPropertyExists() throws Exception {
+        repositoryRule.importFromXML("data.xml");
+        assertThat(repositoryRule.propertyExists("/a/b", Property.JCR_CREATED_BY)).isTrue();
+        assertThat(repositoryRule.propertyExists("/a/b/c", Property.JCR_CREATED_BY)).isTrue();
+        assertThat(repositoryRule.propertyExists("/a/d", Property.JCR_CREATED_BY)).isTrue();
+    }
+
+    @Test
+    public void verifyPropertyEquals() throws Exception {
+        repositoryRule.importFromXML("data.xml");
+        assertThat(repositoryRule.property("/a/b", Property.JCR_CREATED_BY)).hasValueSatisfying(property -> isEquals("admin", property::getString));
+        assertThat(repositoryRule.property("/a/b/c", Property.JCR_CREATED_BY)).hasValueSatisfying(property -> isEquals("admin", property::getString));
+        assertThat(repositoryRule.property("/a/d", Property.JCR_CREATED_BY)).hasValueSatisfying(property -> isEquals("admin", property::getString));
+    }
+
+    private  <T> Consumer<T> isEquals(final T expectedValue,
+                                      final JCRAssertions.ValueAccessor<T> accessor) {
+        return (actual) -> {
+            try {
+                assertThat(accessor.get()).isEqualTo(expectedValue);
+            } catch (final RepositoryException e) {
+                fail(e);
+            }
+        };
     }
 }

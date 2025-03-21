@@ -19,15 +19,14 @@ package com.buralotech.oss.jcrunit;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
-import javax.jcr.ItemExistsException;
-import javax.jcr.PathNotFoundException;
-import javax.jcr.Repository;
-import javax.jcr.RepositoryException;
-import javax.jcr.Session;
-import javax.jcr.SimpleCredentials;
+import javax.jcr.*;
 import java.io.IOException;
+import java.util.function.Consumer;
 
+import static javax.jcr.nodetype.NodeType.NT_FILE;
+import static javax.jcr.nodetype.NodeType.NT_FOLDER;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -167,5 +166,43 @@ class TestJCRRepositoryExtension extends AbstractJCRRepositoryTest {
                 .pathDoesNotExist("/a/b")
                 .pathDoesNotExist("/a/b/c")
                 .pathDoesNotExist("/a/d");
+    }
+
+    @Test
+    @JCRRepositoryConfiguration(importXMLs = "data.xml")
+    void verifyIsType(final JCRRepositoryTester helper) throws RepositoryException {
+        assertThat(helper.isType("/a/b", NT_FILE)).isFalse();
+        assertThat(helper.isType("/a/b", NT_FOLDER)).isTrue();
+        assertThat(helper.isType("/a/b/c", NT_FILE)).isTrue();
+        assertThat(helper.isType("/a/b/c", NT_FOLDER)).isFalse();
+        assertThat(helper.isType("/a/d", NT_FILE)).isFalse();
+        assertThat(helper.isType("/a/d", NT_FOLDER)).isTrue();
+    }
+
+    @Test
+    @JCRRepositoryConfiguration(importXMLs = "data.xml")
+    void verifyPropertyExists(final JCRRepositoryTester helper) throws RepositoryException {
+        assertThat(helper.propertyExists("/a/b", Property.JCR_CREATED_BY)).isTrue();
+        assertThat(helper.propertyExists("/a/b/c", Property.JCR_CREATED_BY)).isTrue();
+        assertThat(helper.propertyExists("/a/d", Property.JCR_CREATED_BY)).isTrue();
+    }
+
+    @Test
+    @JCRRepositoryConfiguration(importXMLs = "data.xml")
+    void verifyPropertyEquals(final JCRRepositoryTester helper) throws RepositoryException {
+        assertThat(helper.property("/a/b", Property.JCR_CREATED_BY)).hasValueSatisfying(property -> isEquals("admin", property::getString));
+        assertThat(helper.property("/a/b/c", Property.JCR_CREATED_BY)).hasValueSatisfying(property -> isEquals("admin", property::getString));
+        assertThat(helper.property("/a/d", Property.JCR_CREATED_BY)).hasValueSatisfying(property -> isEquals("admin", property::getString));
+    }
+
+    private  <T> Consumer<T> isEquals(final T expectedValue,
+                                    final JCRAssertions.ValueAccessor<T> accessor) {
+        return (actual) -> {
+            try {
+                assertThat(accessor.get()).isEqualTo(expectedValue);
+            } catch (final RepositoryException e) {
+                fail(e);
+            }
+        };
     }
 }

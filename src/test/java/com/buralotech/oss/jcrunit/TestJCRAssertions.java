@@ -33,7 +33,7 @@ public class TestJCRAssertions {
         doReturn(false).when(repositoryTester).exists(anyString());
         assertThatThrownBy(() -> assertThat(repositoryTester).pathExists("/a"))
                 .isInstanceOf(AssertionError.class)
-                .hasMessage("Expected /a to exist.");
+                .hasMessage("Expected [/a] to exist.");
         verify(repositoryTester).exists("/a");
     }
 
@@ -52,7 +52,8 @@ public class TestJCRAssertions {
         doReturn(true).when(repositoryTester).exists(anyString());
         assertThatThrownBy(() -> assertThat(repositoryTester).pathDoesNotExist("/a"))
                 .isInstanceOf(AssertionError.class)
-                .hasMessage("Expected /a to not exist.");
+                .hasMessage("Expected [/a] to not exist.");
         verify(repositoryTester).exists("/a");
     }
+
 }

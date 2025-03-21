@@ -26,6 +26,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.Optional;
 
 import static javax.jcr.ImportUUIDBehavior.IMPORT_UUID_COLLISION_THROW;
 import static javax.jcr.Node.JCR_CONTENT;
@@ -395,6 +396,70 @@ public final class JCRRepositoryTester implements AssertProvider<JCRAssertions> 
         final Session session = repository.login(credentials);
         try {
             return session.nodeExists(path);
+        } finally {
+            session.logout();
+        }
+    }
+
+    /**
+     * Verify that the node at the specified path is the expected type.
+     *
+     * @param path     The path.
+     * @param nodeType The expected type.
+     * @return {@code true} if the node has the expected type. Otherwise, {@code false}.
+     * @throws RepositoryException If there was a problem verifying that the node type.
+     */
+    public boolean isType(final String path,
+                          final String nodeType)
+            throws RepositoryException {
+        final Session session = repository.login(credentials);
+        try {
+            final var node = session.getNode(path);
+            return node.isNodeType(nodeType);
+        } finally {
+            session.logout();
+        }
+    }
+
+    /**
+     * Verify that the node at the specified path has the named property.
+     *
+     * @param path         The path.
+     * @param propertyName The property name.
+     * @return {@code true} if the node has the named property. Otherwise, {@code false}.
+     * @throws RepositoryException If there was a problem verifying that the node has the named property.
+     */
+    public boolean propertyExists(final String path,
+                                  final String propertyName)
+            throws RepositoryException {
+        final Session session = repository.login(credentials);
+        try {
+            final var node = session.getNode(path);
+            return node.hasProperty(propertyName);
+        } finally {
+            session.logout();
+        }
+    }
+
+    /**
+     * Get the named property for the node at the specified path.
+     *
+     * @param path         The path.
+     * @param propertyName The property name.
+     * @return The property value.
+     * @throws RepositoryException If there was a problem getting the property.
+     */
+    public <T> Optional<Property> property(final String path,
+                                           final String propertyName)
+            throws RepositoryException {
+        final Session session = repository.login(credentials);
+        try {
+            final var node = session.getNode(path);
+            if (node.hasProperty(propertyName)) {
+                return Optional.of(node.getProperty(propertyName));
+            } else {
+                return Optional.empty();
+            }
         } finally {
             session.logout();
         }
