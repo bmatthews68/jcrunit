@@ -331,12 +331,12 @@
             <version>${assertj.version}</version>
         </dependency>
     </dependencies>
-    <distributionManagement>
+    <!--distributionManagement>
         <site>
             <id>github</id>
             <url>scm:git:git@github.com:bmatthews68/jcrunit.git</url>
         </site>
-    </distributionManagement>
+    </distributionManagement-->
     <scm>
         <url>https://github.com/bmatthews68/jcrunit</url>
         <connection>scm:git:git@github.com:bmatthews68/jcrunit.git</connection>
