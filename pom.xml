@@ -21,23 +21,22 @@
     </prerequisites>
     <groupId>com.buralotech.oss.jcrunit</groupId>
     <artifactId>jcrunit</artifactId>
-    <version>4.0.1-SNAPSHOT</version>
+    <version>4.0.0-SNAPSHOT</version>
     <name>JCR Unit</name>
     <description>JUnit rule/extension for testing with in memory JCR repository.</description>
     <inceptionYear>2015</inceptionYear>
     <url>https://github.com/bmatthews68/jcrunit</url>
     <properties>
-        <assertj.version>3.27.3</assertj.version>
+        <assertj.version>3.26.3</assertj.version>
         <junit4.version>4.13.2</junit4.version>
-        <junit5.version>5.12.2</junit5.version>
-        <mockito.version>5.17.0</mockito.version>
-        <oak.version>1.82.0</oak.version>
+        <junit5.version>5.11.4</junit5.version>
+        <mockito.version>5.14.2</mockito.version>
+        <oak.version>1.76.0</oak.version>
         <slf4j.version>2.0.17</slf4j.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
-        <maven.version.ignore>.+-(M|RC|alpha|beta).+</maven.version.ignore>
     </properties>
     <licenses>
         <license>
@@ -67,7 +66,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-enforcer-plugin</artifactId>
-                <version>3.6.1</version>
+                <version>3.5.0</version>
                 <executions>
                     <execution>
                         <id>enforce-versions</id>
@@ -77,10 +76,10 @@
                         <configuration>
                             <rules>
                                 <requireMavenVersion>
-                                    <version>3.9.10</version>
+                                    <version>3.9.9</version>
                                 </requireMavenVersion>
                                 <requireJavaVersion>
-                                    <version>21</version>
+                                    <version>11</version>
                                 </requireJavaVersion>
                             </rules>
                         </configuration>
@@ -89,7 +88,7 @@
             </plugin>
             <plugin>
                 <artifactId>maven-clean-plugin</artifactId>
-                <version>3.5.0</version>
+                <version>3.4.1</version>
             </plugin>
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -113,7 +112,7 @@
             </plugin>
             <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.5.3</version>
+                <version>3.5.2</version>
             </plugin>
             <plugin>
                 <artifactId>maven-site-plugin</artifactId>
@@ -131,7 +130,7 @@
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
-                <version>0.8.13</version>
+                <version>0.8.12</version>
                 <executions>
                     <execution>
                         <goals>
@@ -165,7 +164,7 @@
                     <plugin>
                         <groupId>org.sonatype.central</groupId>
                         <artifactId>central-publishing-maven-plugin</artifactId>
-                        <version>0.8.0</version>
+                        <version>0.7.0</version>
                         <extensions>true</extensions>
                         <configuration>
                             <publishingServerId>central</publishingServerId>
@@ -175,7 +174,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-gpg-plugin</artifactId>
-                        <version>3.2.8</version>
+                        <version>3.2.7</version>
                         <executions>
                             <execution>
                                 <id>sign-artifacts</id>
@@ -242,11 +241,11 @@
             </plugin>
             <plugin>
                 <artifactId>maven-pmd-plugin</artifactId>
-                <version>3.27.0</version>
+                <version>3.26.0</version>
             </plugin>
             <plugin>
                 <artifactId>maven-surefire-report-plugin</artifactId>
-                <version>3.5.3</version>
+                <version>3.5.2</version>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
