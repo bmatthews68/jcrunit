@@ -24,11 +24,11 @@
     <inceptionYear>2015</inceptionYear>
     <url>https://github.com/bmatthews68/jcrunit</url>
     <properties>
-        <assertj.version>3.27.3</assertj.version>
+        <assertj.version>3.27.4</assertj.version>
         <junit4.version>4.13.2</junit4.version>
         <junit5.version>5.12.2</junit5.version>
         <mockito.version>5.17.0</mockito.version>
-        <oak.version>1.82.0</oak.version>
+        <oak.version>1.84.0</oak.version>
         <slf4j.version>2.0.17</slf4j.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -74,7 +74,7 @@
                         <configuration>
                             <rules>
                                 <requireMavenVersion>
-                                    <version>3.9.10</version>
+                                    <version>3.9.11</version>
                                 </requireMavenVersion>
                                 <requireJavaVersion>
                                     <version>21</version>
@@ -263,7 +263,7 @@
             </plugin>
             <plugin>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>3.11.2</version>
+                <version>3.11.3</version>
                 <configuration>
                     <show>private</show>
                     <nohelp>true</nohelp>
