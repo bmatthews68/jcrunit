@@ -9,8 +9,19 @@ The current release only supports file (`nt:file`) and folder (`nt:folder`) node
 
 == Requirements
 
-* Java 21+
-* JUnit 4.13.2+ or JUnit 5.11.4+
+[%autowidth,cols="h,a"]
+|===
+| 4.0.x
+|
+* Java 21
+* JUnit 4.13.2
+* JUnit Jupiter 5.11.4
+| 4.1.x
+|
+* Java 25
+* JUnit 4.13.2
+* JUnit Jupiter 6.0.0
+|===
 
 == Usage
 
