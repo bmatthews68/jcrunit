@@ -17,7 +17,7 @@ jobs:
     name: Test with JDK ${{ matrix.version }}
     strategy:
       matrix:
-        version: [ 17.0.16, 21.0.8, 25 ]
+        version: [ 25 ]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
