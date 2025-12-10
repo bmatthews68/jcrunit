@@ -73,14 +73,13 @@
                         <configuration>
                             <rules>
                                 <requireMavenVersion>
-                                    <version>4.0.0-rc-4</version>
+                                    <version>4.0.0-rc-5</version>
                                 </requireMavenVersion>
                                 <requireJavaVersion>
                                     <version>25</version>
                                 </requireJavaVersion>
                                 <requireReleaseDeps />
                                 <banDependencyManagementScope />
-                                <dependencyConvergence />
                                 <reactorModuleConvergence />
                                 <requireNoRepositories />
                             </rules>
@@ -111,12 +110,12 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
-                <version>3.4.2</version>
+                <version>3.5.0</version>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>
-                <version>3.3.1</version>
+                <version>3.4.0</version>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -146,7 +145,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-release-plugin</artifactId>
-                <version>3.2.0</version>
+                <version>3.3.0</version>
                 <configuration>
                     <autoVersionSubmodules>true</autoVersionSubmodules>
                     <releaseProfiles>release</releaseProfiles>
@@ -222,7 +221,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-source-plugin</artifactId>
-                        <version>3.3.1</version>
+                        <version>3.4.0</version>
                         <executions>
                             <execution>
                                 <id>attach-sources</id>
@@ -358,11 +357,6 @@
                 <version>${assertj.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
-            </dependency>
-            <dependency>
-                <groupId>commons-io</groupId>
-                <artifactId>commons-io</artifactId>
-                <version>2.20.0</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
