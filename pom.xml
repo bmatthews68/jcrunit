@@ -17,7 +17,7 @@
 <project xmlns="http://maven.apache.org/POM/4.1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation=" http://maven.apache.org/POM/4.1.0 http://maven.apache.org/xsd/maven-4.1.0.xsd">
     <groupId>com.buralotech.oss.jcrunit</groupId>
     <artifactId>jcrunit</artifactId>
-    <version>5.0.0</version>
+    <version>5.0.1-SNAPSHOT</version>
     <name>JCR Unit</name>
     <description>JUnit rule/extension for testing with in memory JCR repository.</description>
     <inceptionYear>2015</inceptionYear>
@@ -410,6 +410,6 @@
         <url>https://github.com/bmatthews68/jcrunit</url>
         <connection>scm:git:git@github.com:bmatthews68/jcrunit.git</connection>
         <developerConnection>scm:git:git@github.com:bmatthews68/jcrunit.git</developerConnection>
-        <tag>5.0.0</tag>
+        <tag>HEAD</tag>
     </scm>
 </project>
