@@ -69,7 +69,7 @@ class RepositoryTest {
 <dependency>
     <groupId>com.buraolotech.oss.jcrunit</groupId>
     <artifactId>jcrunit</artifactId>
-    <version>4.0.0</version>
+    <version>5.0.1</version>
 </dependency>
 ----
 
